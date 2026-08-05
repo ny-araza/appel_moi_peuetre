@@ -7,6 +7,8 @@ TARGET = installed
 TOML = $(CALL_DIR)/pyproject.toml
 SET_CACHE = export UV_CACHE_DIR=$(UV_CACHE) && export HF_HOME=$(HF_CACHE)
 PY_VENV = .venv/bin/python
+FUNCTION_CALLING_JSON = $(CALL_DIR)/data/input/function_calling_tests.json
+FUNCTION_DEFINITION_JSON = $(CALL_DIR)/data/input/functions_definition.json
 
 all: $(TARGET)
 
@@ -27,7 +29,7 @@ sync:
 	uv sync
 
 run:
-	@$(SET_CACHE) && uv run python -m src
+	@uv run python -m src $(ARGUMENTS)
 
 clean:
 	$(SET_CACHE) && uv cache clean && rm -rf $(HF_CACHE)
