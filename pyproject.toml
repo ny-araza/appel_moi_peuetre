@@ -1,9 +1,12 @@
 [project]
-name = "callmemaybe"
+name = "appel-moi-peuetre"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "llm-sdk>=1.0.1",
+    "llm-sdk",
 ]
+
+[tool.uv.sources]
+llm-sdk = { path = "../../../home/ny-araza/goinfre/appel_moi_peuetre/llm_sdk", editable = true }
