@@ -6,6 +6,7 @@ LLM_SDK_DIR = $(CALL_DIR)/llm_sdk
 TARGET = installed
 TOML = $(CALL_DIR)/pyproject.toml
 SET_CACHE = export UV_CACHE_DIR=$(UV_CACHE) && export HF_HOME=$(HF_CACHE)
+PY_VENV = .venv/bin/python
 
 all: $(TARGET)
 
@@ -17,6 +18,9 @@ $(TOML):
 	rm -rf $(CALL_DIR)/main.py
 	mkdir -p $(CALL_DIR)/src
 	touch $(CALL_DIR)/src/__main__.py
+
+install: $(TOML)
+	$(PY_VENV) -m pip install uv pip
 
 sync:
 	$(SET_CACHE) && uv add --editable $(LLM_SDK_DIR)
