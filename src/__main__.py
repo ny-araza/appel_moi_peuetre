@@ -1,5 +1,8 @@
 import sys
-from .parse import get_input
+from .parse import parse
 
 if __name__ == "__main__":
-    print(get_input(sys.argv))
+    try:
+        parse(sys.argv[1:])
+    except Exception as e:
+        print(f"An error occured: {e}")
