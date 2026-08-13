@@ -26,7 +26,7 @@ sync:
 	$(SET_CACHE) && uv add --editable $(LLM_SDK_DIR) && uv sync
 
 run:
-	$(SET_CACHE) && uv run python -m src
+	@$(SET_CACHE) && uv run python -m src
 
 clean:
 	$(SET_CACHE) && uv cache clean && rm -rf $(HF_CACHE)

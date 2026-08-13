@@ -1,16 +1,13 @@
-import sys
-from .parse import parse, read_file
-import os
+from .utils import encode_functions_name
 from llm_sdk import Small_LLM_Model
+import sys
+from .parse import parse
+
 
 if __name__ == "__main__":
     try:
-        config = parse(sys.argv[1:])
         model = Small_LLM_Model()
-        prompt = "2 + 2 = "
-        input_ids = model.encode(prompt)
-        logits = model.get_logirom_input_ids(input_ids)
-        print(logits)
-
+        config = parse(sys.argv[:1])
+        encode_functions_name(model, config)
     except Exception as e:
         print(f"An error occured: {e}")
