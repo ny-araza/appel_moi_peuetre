@@ -25,9 +25,11 @@ def encode_prompt(prompt: str, model: Small_LLM_Model) -> None:
 def encode_functions_name(model: Small_LLM_Model, config: dict[str, Any]) -> None:
     functions_definition = read_file(config["functions_definition"])
     prompt_list = read_file(config["input"])
-    input_prompt_ids = encode_prompt(prompt_list[0]["prompt"])
+    input_prompt_ids = encode_prompt(prompt_list[0]["prompt"], model)
+    res = []
     for item in functions_definition:
         input_ids = model.encode(item["name"]).tolist()[0]
-        
-        
-        
+        if not res:
+            res.append(input_ids[0])
+        else:
+            
