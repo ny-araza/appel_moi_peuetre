@@ -22,6 +22,13 @@ def encode_prompt(prompt: str, model: Small_LLM_Model) -> None:
      return input_ids
 
 
+def get_max_func_len(tab: list[list[int]]) -> int:
+    length_tab = []
+    for l in tab:
+        length_tab.append(len(l))
+    return max(l)
+
+
 def encode_functions_name(model: Small_LLM_Model, config: dict[str, Any]) -> None:
     functions_definition = read_file(config["functions_definition"])
     prompt_list = read_file(config["input"])
@@ -32,4 +39,4 @@ def encode_functions_name(model: Small_LLM_Model, config: dict[str, Any]) -> Non
         if not res:
             res.append(input_ids[0])
         else:
-            
+            pass
