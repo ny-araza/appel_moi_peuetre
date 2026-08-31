@@ -3,9 +3,7 @@ from llm_sdk import Small_LLM_Model
 from .parse import parse, read_file
 from typing import Any
 
-def get_response():
-    model = Small_LLM_Model()
-    prompt = ""
+def get_response(model: Small_LLM_Model, prompt: str):
     input_ids = model.encode(prompt).tolist()[0]
     i = 0
     while prompt and i < 20:
@@ -13,7 +11,7 @@ def get_response():
         max_token = max(logits)
         token = logits.index(max_token)
         input_ids.append(token)
-        print(model.decode([token]))
+        print(model.decode([token]), end="")
         i += 1
 
 
@@ -32,11 +30,16 @@ def get_max_func_len(tab: list[list[int]]) -> int:
 def encode_functions_name(model: Small_LLM_Model, config: dict[str, Any]) -> None:
     functions_definition = read_file(config["functions_definition"])
     prompt_list = read_file(config["input"])
-    input_prompt_ids = encode_prompt(prompt_list[0]["prompt"], model)
-    res = []
-    for item in functions_definition:
-        input_ids = model.encode(item["name"]).tolist()[0]
-        if not res:
-            res.append(input_ids[0])
-        else:
-            pass
+    str_form = []
+    for function in functions_definition:
+        str_form.append(f"{function["name"]}: {function["description"]}")
+
+    var = '\n'.join(str_form)
+
+    prompt = "You are going to treat the following prompt by function " \
+             "calling. Choose one from the functions name with its " \
+             f"description listed below to answer the prompt:\n{var}\n" \
+             f"The prompt is: {prompt_list[0]["prompt"]}\n"\
+             "The function name is : "    
+
+    get_response(model, prompt)
