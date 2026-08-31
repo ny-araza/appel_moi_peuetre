@@ -5,7 +5,8 @@ CALL_DIR = $(GOINFRE)/appel_moi_peuetre
 LLM_SDK_DIR = $(CALL_DIR)/llm_sdk
 TARGET = installed
 TOML = $(CALL_DIR)/pyproject.toml
-SET_CACHE = export UV_CACHE_DIR=$(UV_CACHE) && export HF_HOME=$(HF_CACHE)
+export UV_CACHE_DIR=$(UV_CACHE)
+export HF_HOME=$(HF_CACHE)
 PY_VENV = .venv/bin/python
 
 all: $(TARGET)
@@ -23,13 +24,13 @@ install: $(TOML)
 	$(PY_VENV) -m pip install uv pip
 
 sync:
-	$(SET_CACHE) && uv add --editable $(LLM_SDK_DIR) && uv sync
+	@uv add --editable $(LLM_SDK_DIR) && uv sync
 
 run:
-	@$(SET_CACHE) && uv run python -m src
+	@uv run python -m src
 
 clean:
-	$(SET_CACHE) && uv cache clean && rm -rf $(HF_CACHE)
+	@uv cache clean && rm -rf $(HF_CACHE)
 
 fclean: clean
 	rm -rf $(TARGET)
