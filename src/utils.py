@@ -19,8 +19,16 @@ def get_response(
         input_ids.append(token)
         temp_res += model.decode([token])
         i += 1
-    return temp_res
+    return parse_res(temp_res)
 
+def parse_res(res: str) -> str:
+    forbidden_character = " !*/?"
+    new_res: str = ""
+    for c in res:
+        if c in forbidden_character:
+            c = c.replace(c, "")
+        new_res += c
+    return new_res
 
 def encode_prompt(prompt: str, model: Small_LLM_Model) -> None:
      input_ids = model.encode(prompt).tolist()[0]
@@ -41,7 +49,6 @@ def check_func_in_logits(
 
 
     max_token = logits.index(max(logits))
-
     for i in range(len(logits)):
         logits[i] = float("-inf")
 
@@ -72,7 +79,7 @@ def encode_functions_name(model: Small_LLM_Model, config: dict[str, Any]) -> Non
     prompt = "You are going to treat the following prompt by function " \
              "calling. Choose one from the functions name with its " \
              f"description listed below to answer the prompt:\n{var}\n" \
-             f"The prompt is: {prompt_list[5]["prompt"]}\n"\
+             f"The prompt is: {prompt_list[7]["prompt"]}\n"\
              "The function name is : "
 
     print(get_response(model, prompt, all_function_name))
