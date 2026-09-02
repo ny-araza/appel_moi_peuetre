@@ -11,10 +11,9 @@ def get_response(
     input_ids = model.encode(prompt).tolist()[0]
     i = 0
     temp_res = ""
-    temp_func_ids = functions_ids[:]
-    while prompt and i < get_max_func_len(temp_func_ids):
+    while prompt and i < get_max_func_len(functions_ids):
         logits = model.get_logits_from_input_ids(input_ids)
-        logits, functions_ids = check_func_in_logits(logits, functions_ids, i, model)
+        logits = check_func_in_logits(logits, functions_ids)
         max_token = max(logits)
         token = logits.index(max_token)
         input_ids.append(token)
@@ -38,48 +37,24 @@ def get_max_func_len(functions_name: list[list[int]]) -> int:
 def check_func_in_logits(
         logits: list[float],
         function_ids: list[list[int]],
-        function_index: int,
-        model: Small_LLM_Model
-        ) -> tuple[list[float], list[list[int]]]:
+        ) -> list[float]:
 
+
+    max_token = logits.index(max(logits))
 
     for i in range(len(logits)):
         logits[i] = float("-inf")
 
-    max_token = logits.index(max(logits))
-    print(f"max_token = {model.encode(max_token)}")
-    # if function_ids:
-    for i in range(len(function_ids)):
-        print(i)
-        print(f"function_ids = {function_ids[i][function_index]}, len = {len(function_ids)}")
-        print(f"index = {function_index}")
-        if max_token != function_ids[i][function_index]:
-            function_ids.pop(i)
-        else:
-            logits[max_token] = float("+inf")
-    return (logits, function_ids)
+    function_set = set()
+    for item in function_ids:
+        for token in item:
+            function_set.add(token)
 
-# logits = [-inf]
-# index =  [0,1,2,3,4,5,6,7,8]
-# fun_ids = [[0,3,5], [0,6,8,1], [0,9,5,3]]
-# res = [0,6,8,1]
-# fun_index = 0
-# max_token = 0
-# func_temp = fun_ids
-# ******************************* #
+    if max_token in function_set:
+        logits[max_token] = float("+inf")
+    return (logits)
 
-# max_token == func_ids[0][0] oui
-# max_token == fun_ids[1][0] oui
-# max_token == fun_ids[2][0] oui
-# logits[max_token] = +inf
-# ******************************* #
-# max_token = 6
-# fun_index = 1
-# max_token == fun_ids[0][1] non
-# func_temp.pop(0) => func_temp = [[0,6,8,1], [0,9,5,3]]
-# max_token == fun_ids[1][1] oui
-# max_token == fun_ids[2][1] non
-# func_temp.pop(2) => func_temp = [[0,6,8,1]]
+# func_ids [[8822, 2891, 32964], [8822, 1889, 3744], [8822, 43277, 3904], [8822, 3062, 39794, 12993], [8822, 5228, 7660, 3904, 6615, 41832]]
 
 def encode_functions_name(model: Small_LLM_Model, config: dict[str, Any]) -> None:
     functions_definition = read_file(config["functions_definition"])
@@ -97,7 +72,7 @@ def encode_functions_name(model: Small_LLM_Model, config: dict[str, Any]) -> Non
     prompt = "You are going to treat the following prompt by function " \
              "calling. Choose one from the functions name with its " \
              f"description listed below to answer the prompt:\n{var}\n" \
-             f"The prompt is: {prompt_list[0]["prompt"]}\n"\
+             f"The prompt is: {prompt_list[5]["prompt"]}\n"\
              "The function name is : "
 
     print(get_response(model, prompt, all_function_name))
