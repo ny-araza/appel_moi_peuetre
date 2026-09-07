@@ -2,6 +2,7 @@ import sys
 from llm_sdk import Small_LLM_Model
 from .parse import parse, read_file
 from typing import Any
+from .parameters import get_parameters
 
 def get_response(
         model: Small_LLM_Model, 
@@ -11,7 +12,7 @@ def get_response(
     input_ids = model.encode(prompt).tolist()[0]
     i = 0
     temp_res = ""
-    while prompt and i < get_max_func_len(functions_ids):
+    while i < get_max_func_len(functions_ids):
         logits = model.get_logits_from_input_ids(input_ids)
         logits = check_func_in_logits(logits, functions_ids)
         max_token = max(logits)
@@ -76,13 +77,12 @@ def get_function_name(model: Small_LLM_Model, config: dict[str, Any]) -> list[di
         all_function_name.append(input_ids)
 
     var = '\n'.join(str_form)
-
     for prompt in prompt_list:
         temp_prompt = "You are going to treat the following prompt by function " \
                 "calling. Choose one from the functions name with its " \
                 f"description listed below to answer the prompt:\n{var}\n" \
                 f"The prompt is: {prompt["prompt"]}\n"\
-                "The function name is : "
+                "The function name is : " \
 
         result.append(
             {
@@ -91,5 +91,7 @@ def get_function_name(model: Small_LLM_Model, config: dict[str, Any]) -> list[di
                 "parameters": ""
             }
         )
+
+    get_parameters(model, result, functions_definition)
 
     return result
