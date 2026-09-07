@@ -4,6 +4,7 @@ from .parse import parse, read_file
 from typing import Any
 from .parameters import get_parameters
 
+
 def get_response(
         model: Small_LLM_Model, 
         prompt: str, 
@@ -12,7 +13,7 @@ def get_response(
     input_ids = model.encode(prompt).tolist()[0]
     i = 0
     temp_res = ""
-    while i < get_max_func_len(functions_ids):
+    while i <= get_max_func_len(functions_ids):
         logits = model.get_logits_from_input_ids(input_ids)
         logits = check_func_in_logits(logits, functions_ids)
         max_token = max(logits)
@@ -30,7 +31,10 @@ def parse_res(res: str) -> str:
         if c in forbidden_character:
             c = c.replace(c, "")
         new_res += c
+    if new_res[-2:] == "fn":
+        return new_res[:-2]    
     return new_res
+
 
 
 def encode_prompt(prompt: str, model: Small_LLM_Model) -> None:
