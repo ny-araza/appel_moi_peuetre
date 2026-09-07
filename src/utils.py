@@ -21,14 +21,16 @@ def get_response(
         i += 1
     return parse_res(temp_res)
 
+
 def parse_res(res: str) -> str:
-    forbidden_character = " !*/?"
+    forbidden_character = "!*/?@"
     new_res: str = ""
     for c in res:
         if c in forbidden_character:
             c = c.replace(c, "")
         new_res += c
     return new_res
+
 
 def encode_prompt(prompt: str, model: Small_LLM_Model) -> None:
      input_ids = model.encode(prompt).tolist()[0]
@@ -61,9 +63,8 @@ def check_func_in_logits(
         logits[max_token] = float("+inf")
     return (logits)
 
-# func_ids [[8822, 2891, 32964], [8822, 1889, 3744], [8822, 43277, 3904], [8822, 3062, 39794, 12993], [8822, 5228, 7660, 3904, 6615, 41832]]
 
-def encode_functions_name(model: Small_LLM_Model, config: dict[str, Any]) -> None:
+def get_function_name(model: Small_LLM_Model, config: dict[str, Any]) -> None:
     functions_definition = read_file(config["functions_definition"])
     prompt_list = read_file(config["input"])
     str_form = []
