@@ -29,47 +29,45 @@ def get_response(
     input_ids = model.encode(prompt).tolist()[0]
     i = 0
     temp_res = ""
-    while prompt and i < 60:
+    while i < 60:
         logits = model.get_logits_from_input_ids(input_ids)
         max_token = max(logits)
         token = logits.index(max_token)
+        temp = model.decode([token])
+        temp_res += temp
+        if "}" in temp:
+            break
         input_ids.append(token)
-        temp_res += model.decode([token])
         i += 1
     return temp_res
-
-
-def get_length_parameters(function: dict[Any, Any]) -> int:
-    pass
 
 
 def get_parameters(
         model: Small_LLM_Model, 
         res_json: list[dict[Any, Any]],
         list_functions: list[dict[Any, Any]]
-        ) -> None:
+        ) -> list[dict[Any, Any]]:
 
 
     function = {}
-    print(res_json)
-    # for item in list_functions:
-    #     if item["name"] == res_json[8]["name"]:
-    #         function.update(item)
+    for r in res_json:
+        for item in list_functions:
+            if item["name"] == r["name"]:
+                function.update(item)
 
-    # temp_prompt = f"You are a function calling argument extraction agent."\
-    #             "Your task is to extract the arguments needed to call the function..\n"\
-    #             f"FUNCTION: {function["name"]}\n"\
-    #             f"{function["description"]}"\
-    #             f"Function parameters: {function["parameters"]}\n User request: {res_json[8]["prompt"]} "\
-    #             "Rules:\n"\
-    #             "Extract ONLY parameters that are defined in the function parameters.\n"\
-    #             "Match information from the user request to the corresponding parameter."\
-    #             "Do NOT invent, guess, or infer values that are not explicitly provided."\
-    #             "If a required parameter is not provided, set its value to null."\
-    #             "Ignore information that is not relevant to the function."\
-    #             "Preserve the value exactly as given by the user whenever possible."\
-    #             "Return ONLY a JSON object containing the parameter names and their values."\
-    #             "Do not add explanations, comments, or additional text."\
-    #             "Output:"\
-    #             "{'name': 'value'}"
-    # print(get_response(model, temp_prompt))
+        temp_prompt = "You are a function argument extraction agent. Extract parameters strictly using the provided context:" \
+                        f"FUNCTION: {function["name"]}\n" \
+                        f"DESCRIPTION : {function["description"]}\n" \
+                        f"PARAMETERS:: {function["parameters"]}\n" \
+                        f"USER REQUEST : {r["prompt"]}\n" \
+                    """Rules::
+                        1. Extract ONLY parameters defined in the function.
+                        2. Do NOT invent, guess, or infer values.
+                        3. Set missing required parameters to null.
+                        4. Preserve exact user values.
+                        5. Output ONLY a valid JSON object: {"param_name": "value"}. No explanations or extra text.
+                        Output:
+                    """
+
+        r["parameters"] = get_response(model, temp_prompt)
+    return res_json

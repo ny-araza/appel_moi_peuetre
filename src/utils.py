@@ -88,14 +88,15 @@ def get_function_name(model: Small_LLM_Model, config: dict[str, Any]) -> list[di
                 f"The prompt is: {prompt["prompt"]}\n"\
                 "The function name is : " \
 
+        function_name = get_response(model, temp_prompt, all_function_name)
+
         result.append(
             {
                 "prompt": prompt["prompt"],
-                "name": get_response(model, temp_prompt, all_function_name),
+                "name": function_name,
                 "parameters": ""
             }
         )
 
-    get_parameters(model, result, functions_definition)
 
-    return result
+    return get_parameters(model, result,functions_definition)
