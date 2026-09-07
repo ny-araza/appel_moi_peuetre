@@ -8,6 +8,6 @@ if __name__ == "__main__":
     try:
         model = Small_LLM_Model()
         config = parse(sys.argv[:1])
-        get_function_name(model, config)
+        print(get_function_name(model, config))
     except Exception as e:
         print(f"An error occured: {e}")

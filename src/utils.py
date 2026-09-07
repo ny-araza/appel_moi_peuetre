@@ -64,12 +64,12 @@ def check_func_in_logits(
     return (logits)
 
 
-def get_function_name(model: Small_LLM_Model, config: dict[str, Any]) -> None:
+def get_function_name(model: Small_LLM_Model, config: dict[str, Any]) -> list[dict[Any, Any]]:
     functions_definition = read_file(config["functions_definition"])
     prompt_list = read_file(config["input"])
     str_form = []
     all_function_name = []
-
+    result: list[dict[Any, Any]] = []
     for function in functions_definition:
         str_form.append(f"{function["name"]}: {function["description"]}")
         input_ids = model.encode(function["name"]).tolist()[0]
@@ -77,10 +77,19 @@ def get_function_name(model: Small_LLM_Model, config: dict[str, Any]) -> None:
 
     var = '\n'.join(str_form)
 
-    prompt = "You are going to treat the following prompt by function " \
-             "calling. Choose one from the functions name with its " \
-             f"description listed below to answer the prompt:\n{var}\n" \
-             f"The prompt is: {prompt_list[7]["prompt"]}\n"\
-             "The function name is : "
+    for prompt in prompt_list:
+        temp_prompt = "You are going to treat the following prompt by function " \
+                "calling. Choose one from the functions name with its " \
+                f"description listed below to answer the prompt:\n{var}\n" \
+                f"The prompt is: {prompt["prompt"]}\n"\
+                "The function name is : "
 
-    print(get_response(model, prompt, all_function_name))
+        result.append(
+            {
+                "prompt": prompt["prompt"],
+                "name": get_response(model, temp_prompt, all_function_name),
+                "parameters": ""
+            }
+        )
+
+    return result
