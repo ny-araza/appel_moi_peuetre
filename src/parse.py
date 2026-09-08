@@ -11,7 +11,7 @@ def parse(arguments: list[str]) -> dict[str, Any]:
     function_definition_path: str = os.path.join(
         current_dir, "data/input/functions_definition.json"
     )
-    output_path_dir: str = os.path.join(current_dir, "data/output")
+    output_path_dir: str = os.path.join(current_dir, "data/output.json")
     cpt_option: int = 0
 
     res = {
@@ -19,7 +19,6 @@ def parse(arguments: list[str]) -> dict[str, Any]:
         "input": function_calling_path,
         "output": output_path_dir
     }
-
     if len(arguments) > 6:
         raise Exception (
             "Arguments must be : "

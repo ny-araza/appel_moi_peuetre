@@ -83,19 +83,20 @@ def get_parameters(
             if item["name"] == r["name"]:
                 function.update(item)
 
-        temp_prompt = "You are a function argument extraction agent. Extract parameters strictly using the provided context:" \
-                        f"FUNCTION: {function["name"]}\n" \
-                        f"DESCRIPTION : {function["description"]}\n" \
-                        f"PARAMETERS:: {function["parameters"]}\n" \
-                        f"USER REQUEST : {r["prompt"]}\n" \
-                    """Rules::
-                        1. Extract ONLY parameters defined in the function.
-                        2. Do NOT invent, guess, or infer values.
-                        3. Set missing required parameters to null.
-                        4. Preserve exact user values.
-                        5. Output ONLY a valid JSON object: {"param_name": "value"}. No explanations or extra text.
-                        Output:
-                    """
-
+        temp_prompt = f"You are a function calling argument extraction agent."\
+                        "Your task is to extract the arguments needed to call the function..\n"\
+                        f"FUNCTION: {function["name"]}\n"\
+                        f"{function["description"]}"\
+                        f"Function parameters: {function["parameters"]}\n User request: {r["prompt"]}"\
+                        "Rules:\n"\
+                        "Extract ONLY parameters that are defined in the function parameters.\n"\
+                        "Match information from the user request to the corresponding parameter."\
+                        "Do NOT invent, guess, or infer values that are not explicitly provided."\
+                        "If a required parameter is not provided, set its value to null."\
+                        "Ignore information that is not relevant to the function."\
+                        "Preserve the value exactly as given by the user whenever possible."\
+                        "Return ONLY a JSON object containing the parameter names and their values."\
+                        "Do not add explanations, comments, or additional text."\
+                        "Output:"
         r["parameters"] = parse_parameters(get_response(model, temp_prompt), function)
     return res_json
