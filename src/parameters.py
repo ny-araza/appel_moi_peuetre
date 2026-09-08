@@ -54,16 +54,20 @@ def parse_parameters(parameters: str, function: dict[Any, Any]) -> dict[Any, Any
     for t in tmp:
         item = t.split(":")
         res.update({
-            item[0].strip("\""): item[1].strip()
+            item[0].strip("\""): item[1].strip("\"")
         })
-    return res
+    return cast_parameters(res, function)
 
 
 def cast_parameters(
         parameters: dict[Any, Any], 
         function: dict[Any, Any]
         ) -> dict[Any, Any]:
-    
+    type_parameters = function["parameters"]
+    for item in parameters.items():
+        if type_parameters[item[0]]["type"] == "number":
+            parameters.update({item[0]: float(item[1])})
+    return parameters
 
 
 def get_parameters(
@@ -93,5 +97,5 @@ def get_parameters(
                         Output:
                     """
 
-        r["parameters"] = parse_parameters(get_response(model, temp_prompt))
+        r["parameters"] = parse_parameters(get_response(model, temp_prompt), function)
     return res_json
