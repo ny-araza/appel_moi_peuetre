@@ -10,6 +10,6 @@ if __name__ == "__main__":
         model = Small_LLM_Model()
         config = parse(sys.argv[:1])
         result = get_function_name(model, config)
-
+        generate_json_file("output.txt", result)
     except Exception as e:
         print(f"An error occured: {e}")

@@ -1,6 +1,6 @@
 from llm_sdk import Small_LLM_Model
 from typing import Any
-
+import json
 
 def check_func_in_logits(
         logits: list[float],
@@ -42,6 +42,30 @@ def get_response(
     return temp_res
 
 
+def parse_parameters(parameters: str, function: dict[Any, Any]) -> dict[Any, Any]:
+    forbidden_character = " +-&%!*/?@\n'"
+    res: dict[str, Any] = {}
+    temp = ""
+    for c in parameters:
+        if c in forbidden_character:
+            c = c.replace(c, "")
+        temp += c
+    tmp = temp[1:-1].split(",")
+    for t in tmp:
+        item = t.split(":")
+        res.update({
+            item[0].strip("\""): item[1].strip()
+        })
+    return res
+
+
+def cast_parameters(
+        parameters: dict[Any, Any], 
+        function: dict[Any, Any]
+        ) -> dict[Any, Any]:
+    
+
+
 def get_parameters(
         model: Small_LLM_Model, 
         res_json: list[dict[Any, Any]],
@@ -69,5 +93,5 @@ def get_parameters(
                         Output:
                     """
 
-        r["parameters"] = get_response(model, temp_prompt)
+        r["parameters"] = parse_parameters(get_response(model, temp_prompt))
     return res_json
