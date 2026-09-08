@@ -3,6 +3,7 @@ from llm_sdk import Small_LLM_Model
 import sys
 from .parse import parse
 from .output import generate_json_file
+import json
 
 if __name__ == "__main__":
     try:
