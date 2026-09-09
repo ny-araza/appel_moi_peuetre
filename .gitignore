@@ -2,5 +2,4 @@
 .venv
 __pycach*
 src/__pycach*
-main.py
 installed

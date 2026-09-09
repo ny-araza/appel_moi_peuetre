@@ -1,7 +1,7 @@
 from typing import Any
 import json
 from pydantic import BaseModel, TypeAdapter, ValidationError
-
+import os
 
 class Output(BaseModel):
     prompt: str
@@ -22,8 +22,19 @@ def validate_json(res_json: list[dict[Any, Any]]) -> bool:
 
 
 def generate_json_file(filename: str, res_json: list[dict[Any, Any]]) -> None:
+    outputpath: str = ""
     if (validate_json(res_json)):
-        with open(filename, "w") as fd:
+        if not os.path.exists(filename):
+            if os.path.isdir(filename):
+                os.mkdir(filename)
+            else:
+                outputpath = filename
+        else:
+            if os.path.isdir(filename):
+                outputpath = filename + "/output.json"
+            else:
+                outputpath = filename
+        with open(outputpath, "w") as fd:
             json.dump(res_json, fd, indent=2)
     else:
         raise ValueError("JSON generated not valide")

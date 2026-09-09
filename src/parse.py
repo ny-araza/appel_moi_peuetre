@@ -3,16 +3,32 @@ import json
 import os
 
 
+def check_flag_valid(argv: list[str]) -> bool:
+    flag_valid = ["--input", "--output", "--functions_definition"]
+    cpt: int = 0
+    if len(argv) > 0:
+        for argument in argv:
+            for flag in flag_valid:
+                if argument == flag:
+                    cpt += 1
+    else:
+        return True
+    if cpt > 3 or cpt == 0:
+        return False
+    return True
+
+
 def parse(arguments: list[str]) -> dict[str, Any]:
     res: dict[str, Any] = {}
     current_dir = os.path.abspath(os.getcwd())
+    output_dir = current_dir + "/data/output"
     function_calling_path: str = os.path.join(
         current_dir, "data/input/function_calling_tests.json"
     )
     function_definition_path: str = os.path.join(
         current_dir, "data/input/functions_definition.json"
     )
-    output_path_dir: str = os.path.join(current_dir, "data/output.json")
+    output_path_dir: str = output_dir
     cpt_option: int = 0
 
     res = {
@@ -20,10 +36,10 @@ def parse(arguments: list[str]) -> dict[str, Any]:
         "input": function_calling_path,
         "output": output_path_dir
     }
-    if len(arguments) > 6:
+    if not check_flag_valid(arguments) or len(arguments) > 6:
         raise Exception(
             "Arguments must be : "
-            "   --function_definition <function_calling_path>"
+            "   --functions_definition <function_calling_path>"
             "   --input <input_path>"
             "   --output <output_path>"
         )
@@ -40,10 +56,10 @@ def parse(arguments: list[str]) -> dict[str, Any]:
 
     if arguments and cpt_option > 3:
         raise Exception(
-                    "Arguments must be : "
-                    "   --function_definition <function_calling_path>"
-                    "   --input <input_path>"
-                    "   --output <output_path>"
+            "Arguments must be : "
+            "   --functions_definition <function_calling_path>"
+            "   --input <input_path>"
+            "   --output <output_path>"
         )
 
     return res

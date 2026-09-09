@@ -1,6 +1,6 @@
+import sys
 from .utils import get_function_name  # type: ignore
 from llm_sdk import Small_LLM_Model  # type: ignore
-import sys
 from .parse import parse  # type: ignore
 from .output import generate_json_file  # type: ignore
 
