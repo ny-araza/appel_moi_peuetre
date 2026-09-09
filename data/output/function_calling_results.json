@@ -1,0 +1,18 @@
+[
+  {
+    "prompt": "What is the sum of 2 and?",
+    "name": "fn_add_numbers",
+    "parameters": {
+      "a": "2",
+      "b": 5.0
+    }
+  },
+  {
+    "prompt": "What is the sum of 2651212123123  and 344561245?",
+    "name": "fn_add_numbers",
+    "parameters": {
+      "a": "2651212123123",
+      "b": 344561245.0
+    }
+  }
+]
