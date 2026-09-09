@@ -25,15 +25,14 @@ def generate_json_file(filename: str, res_json: list[dict[Any, Any]]) -> None:
     outputpath: str = ""
     if (validate_json(res_json)):
         if not os.path.exists(filename):
-            if os.path.isdir(filename):
+            if filename.split("/")[-2:] == ["data", "output"]:
                 os.mkdir(filename)
             else:
                 outputpath = filename
+        if os.path.isdir(filename):
+            outputpath = os.path.join(filename, "output.json")
         else:
-            if os.path.isdir(filename):
-                outputpath = filename + "/output.json"
-            else:
-                outputpath = filename
+            outputpath = filename
         with open(outputpath, "w") as fd:
             json.dump(res_json, fd, indent=2)
     else:
