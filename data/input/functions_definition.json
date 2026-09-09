@@ -27,6 +27,18 @@
     }
   },
   {
+    "name": "fn_check_status",
+    "description": "Checks the system status based on whether the access is active.",
+    "parameters": {
+      "is_active": {
+        "type": "bool"
+      }
+    },
+    "returns": {
+      "type": "string"
+    }
+  },
+  {
     "name": "fn_reverse_string",
     "description": "Reverse a string and return the reversed result.",
     "parameters": {

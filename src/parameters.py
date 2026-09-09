@@ -43,7 +43,7 @@ def get_response(
 
 
 def parse_parameters(parameters: str, function: dict[Any, Any]) -> dict[Any, Any]:
-    forbidden_character = " +-&%!*/?@\n'"
+    forbidden_character = " +-&%!*/?@\n'`"
     res: dict[str, Any] = {}
     temp = ""
     for c in parameters:
@@ -64,9 +64,12 @@ def cast_parameters(
         function: dict[Any, Any]
         ) -> dict[Any, Any]:
     type_parameters = function["parameters"]
+    print(type_parameters)
     for item in parameters.items():
         if type_parameters[item[0]]["type"] == "number":
             parameters.update({item[0]: float(item[1])})
+        if type_parameters[item[0]]["type"] == "bool":
+            parameters.update({item[0]: item[1].strip().lower() == "true"})
     return parameters
 
 

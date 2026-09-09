@@ -1,7 +1,7 @@
 from typing import Any
 import json
 from pydantic import BaseModel, TypeAdapter, ValidationError
-
+import json
 
 class Output(BaseModel):
     prompt: str
@@ -11,8 +11,9 @@ class Output(BaseModel):
 
 def validate_json(res_json: list[dict[Any, Any]]) -> bool:
     try:
+        json_parse = json.dumps(res_json)
         adapter = TypeAdapter(list[Output])
-        adapter.validate_json(str(res_json).replace("\'", "\""))
+        adapter.validate_json(json_parse)
         return True
     except ValidationError as e:
         for error in e.errors():
