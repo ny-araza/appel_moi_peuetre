@@ -1,12 +1,11 @@
-from llm_sdk import Small_LLM_Model
+from llm_sdk import Small_LLM_Model  # type: ignore
 from typing import Any
-import json
+
 
 def check_func_in_logits(
         logits: list[float],
         function_ids: list[list[int]],
         ) -> list[float]:
-
 
     max_token = logits.index(max(logits))
     for i in range(len(logits)):
@@ -23,7 +22,7 @@ def check_func_in_logits(
 
 
 def get_response(
-        model: Small_LLM_Model, 
+        model: Small_LLM_Model,
         prompt: str,
         ) -> str:
     input_ids = model.encode(prompt).tolist()[0]
@@ -42,7 +41,10 @@ def get_response(
     return temp_res
 
 
-def parse_parameters(parameters: str, function: dict[Any, Any]) -> dict[Any, Any]:
+def parse_parameters(
+        parameters: str,
+        function: dict[Any, Any]
+        ) -> dict[Any, Any]:
     forbidden_character = " +-&%!*/?@\n'`"
     res: dict[str, Any] = {}
     temp = ""
@@ -60,11 +62,10 @@ def parse_parameters(parameters: str, function: dict[Any, Any]) -> dict[Any, Any
 
 
 def cast_parameters(
-        parameters: dict[Any, Any], 
+        parameters: dict[Any, Any],
         function: dict[Any, Any]
         ) -> dict[Any, Any]:
     type_parameters = function["parameters"]
-    print(type_parameters)
     for item in parameters.items():
         if type_parameters[item[0]]["type"] == "number":
             parameters.update({item[0]: float(item[1])})
@@ -74,11 +75,10 @@ def cast_parameters(
 
 
 def get_parameters(
-        model: Small_LLM_Model, 
+        model: Small_LLM_Model,
         res_json: list[dict[Any, Any]],
         list_functions: list[dict[Any, Any]]
         ) -> list[dict[Any, Any]]:
-
 
     function = {}
     for r in res_json:
@@ -86,20 +86,34 @@ def get_parameters(
             if item["name"] == r["name"]:
                 function.update(item)
 
-        temp_prompt = f"You are a function calling argument extraction agent."\
-                        "Your task is to extract the arguments needed to call the function..\n"\
-                        f"FUNCTION: {function["name"]}\n"\
-                        f"{function["description"]}"\
-                        f"Function parameters: {function["parameters"]}\n User request: {r["prompt"]}"\
-                        "Rules:\n"\
-                        "Extract ONLY parameters that are defined in the function parameters.\n"\
-                        "Match information from the user request to the corresponding parameter."\
-                        "Do NOT invent, guess, or infer values that are not explicitly provided."\
-                        "If a required parameter is not provided, set its value to null."\
-                        "Ignore information that is not relevant to the function."\
-                        "Preserve the value exactly as given by the user whenever possible."\
-                        "Return ONLY a JSON object containing the parameter names and their values."\
-                        "Do not add explanations, comments, or additional text."\
-                        "Output:"
-        r["parameters"] = parse_parameters(get_response(model, temp_prompt), function)
+        temp_prompt = [
+                    f"You are a function calling argument extraction agent."
+                    "Your task is to extract the arguments needed "
+                    "to call the function..\n"
+                    f"FUNCTION: {function["name"]}\n"
+                    f"{function["description"]}"
+                    f"Function parameters: {function["parameters"]}\n "
+                    f"User request: {r["prompt"]}"
+                    "Rules:\n"
+                    "Extract ONLY parameters that are "
+                    "defined in the function parameters.\n"
+                    "Match information from the user request "
+                    "to the corresponding parameter."
+                    "Do NOT invent, guess, or infer values "
+                    "that are not explicitly provided."
+                    "If a required parameter is not "
+                    "provided, set its value to null."
+                    "Ignore information that is not "
+                    "relevant to the function."
+                    "Preserve the value exactly as given by "
+                    "the user whenever possible."
+                    "Return ONLY a JSON object containing the "
+                    "parameter names and their values."
+                    "Do not add explanations, comments, "
+                    "or additional text."
+                    "Output:"]
+        r["parameters"] = parse_parameters(
+            get_response(model, temp_prompt[0]),
+            function
+            )
     return res_json

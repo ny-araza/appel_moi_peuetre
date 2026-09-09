@@ -2,6 +2,7 @@ from typing import Any
 import json
 import os
 
+
 def parse(arguments: list[str]) -> dict[str, Any]:
     res: dict[str, Any] = {}
     current_dir = os.path.abspath(os.getcwd())
@@ -20,7 +21,7 @@ def parse(arguments: list[str]) -> dict[str, Any]:
         "output": output_path_dir
     }
     if len(arguments) > 6:
-        raise Exception (
+        raise Exception(
             "Arguments must be : "
             "   --function_definition <function_calling_path>"
             "   --input <input_path>"
@@ -38,7 +39,7 @@ def parse(arguments: list[str]) -> dict[str, Any]:
             cpt_option += 1
 
     if arguments and cpt_option > 3:
-        raise Exception (
+        raise Exception(
                     "Arguments must be : "
                     "   --function_definition <function_calling_path>"
                     "   --input <input_path>"
@@ -46,6 +47,7 @@ def parse(arguments: list[str]) -> dict[str, Any]:
         )
 
     return res
+
 
 def read_file(file: str) -> list[dict[Any, Any]]:
     data: list[dict[Any, Any]] = []

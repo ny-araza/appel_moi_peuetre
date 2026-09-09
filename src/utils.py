@@ -1,13 +1,12 @@
-import sys
-from llm_sdk import Small_LLM_Model
-from .parse import parse, read_file
+from llm_sdk import Small_LLM_Model  # type: ignore
+from .parse import read_file  # type: ignore
 from typing import Any
-from .parameters import get_parameters
+from .parameters import get_parameters  # type: ignore
 
 
 def get_response(
-        model: Small_LLM_Model, 
-        prompt: str, 
+        model: Small_LLM_Model,
+        prompt: str,
         functions_ids: list[list[int]]
         ) -> str:
     input_ids = model.encode(prompt).tolist()[0]
@@ -32,20 +31,19 @@ def parse_res(res: str) -> str:
             c = c.replace(c, "")
         new_res += c
     if new_res[-2:] == "fn":
-        return new_res[:-2]    
+        return new_res[:-2]
     return new_res
 
 
-
-def encode_prompt(prompt: str, model: Small_LLM_Model) -> None:
-     input_ids = model.encode(prompt).tolist()[0]
-     return input_ids
+def encode_prompt(prompt: str, model: Small_LLM_Model) -> list[int]:
+    input_ids: list[int] = model.encode(prompt).tolist()[0]
+    return input_ids
 
 
 def get_max_func_len(functions_name: list[list[int]]) -> int:
     length_tab = []
-    for l in functions_name:
-        length_tab.append(len(l))
+    for func in functions_name:
+        length_tab.append(len(func))
     return max(length_tab)
 
 
@@ -53,7 +51,6 @@ def check_func_in_logits(
         logits: list[float],
         function_ids: list[list[int]],
         ) -> list[float]:
-
 
     max_token = logits.index(max(logits))
     for i in range(len(logits)):
@@ -69,7 +66,10 @@ def check_func_in_logits(
     return (logits)
 
 
-def get_function_name(model: Small_LLM_Model, config: dict[str, Any]) -> list[dict[Any, Any]]:
+def get_function_name(
+        model: Small_LLM_Model,
+        config: dict[str, Any]
+        ) -> list[dict[Any, Any]]:
     functions_definition = read_file(config["functions_definition"])
     prompt_list = read_file(config["input"])
     str_form = []
@@ -82,13 +82,16 @@ def get_function_name(model: Small_LLM_Model, config: dict[str, Any]) -> list[di
 
     var = '\n'.join(str_form)
     for prompt in prompt_list:
-        temp_prompt = "You are going to treat the following prompt by function " \
-                "calling. Choose one from the functions name with its " \
-                f"description listed below to answer the prompt:\n{var}\n" \
-                f"The prompt is: {prompt["prompt"]}\n"\
-                "The function name is : " \
+        temp_prompt = [
+                "You are going to treat "
+                "the following prompt by function "
+                "calling. Choose one from the functions name with its "
+                f"description listed below to answer the prompt:\n{var}\n"
+                f"The prompt is: {prompt["prompt"]}\n"
+                "The function name is : "
+            ]
 
-        function_name = get_response(model, temp_prompt, all_function_name)
+        function_name = get_response(model, temp_prompt[0], all_function_name)
 
         result.append(
             {
@@ -97,6 +100,5 @@ def get_function_name(model: Small_LLM_Model, config: dict[str, Any]) -> list[di
                 "parameters": ""
             }
         )
-
-
-    return get_parameters(model, result,functions_definition)
+    result = get_parameters(model, result, functions_definition)
+    return result
