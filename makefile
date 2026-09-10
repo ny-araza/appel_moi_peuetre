@@ -1,7 +1,7 @@
 GOINFRE = /home/$(USER)/goinfre
 UV_CACHE = $(GOINFRE)/uv_cache
 HF_CACHE = $(GOINFRE)/home
-CALL_DIR = $(GOINFRE)/appel_moi_peuetre
+CALL_DIR = $(CURDIR)
 LLM_SDK_DIR = $(CALL_DIR)/llm_sdk
 TARGET = installed
 TOML = $(CALL_DIR)/pyproject.toml
