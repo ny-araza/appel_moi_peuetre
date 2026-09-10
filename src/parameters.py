@@ -67,6 +67,8 @@ def cast_parameters(
         ) -> dict[Any, Any]:
     type_parameters = function["parameters"]
     for item in parameters.items():
+        if not type_parameters[item[0]]["type"]:
+            raise ValueError("Parameter must have a value")
         if type_parameters[item[0]]["type"] == "number":
             parameters.update({item[0]: float(item[1])})
         if type_parameters[item[0]]["type"] == "bool":

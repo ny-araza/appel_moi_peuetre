@@ -12,9 +12,12 @@ def get_response(
     input_ids = model.encode(prompt).tolist()[0]
     i = 0
     temp_res = ""
+    res = []
     while i <= get_max_func_len(functions_ids):
         logits = model.get_logits_from_input_ids(input_ids)
-        logits = check_func_in_logits(logits, functions_ids)
+        logits, functions_ids, res = check_func_in_logits(
+            logits, functions_ids, res
+            )
         max_token = max(logits)
         token = logits.index(max_token)
         input_ids.append(token)
@@ -43,6 +46,8 @@ def encode_prompt(prompt: str, model: Small_LLM_Model) -> list[int]:
 def get_max_func_len(functions_name: list[list[int]]) -> int:
     length_tab = []
     for func in functions_name:
+        if not func:
+            raise ValueError("Function must have a name")
         length_tab.append(len(func))
     return max(length_tab)
 
@@ -50,20 +55,24 @@ def get_max_func_len(functions_name: list[list[int]]) -> int:
 def check_func_in_logits(
         logits: list[float],
         function_ids: list[list[int]],
-        ) -> list[float]:
+        res: list[int],
+        ) -> tuple[
+            list[float], 
+            list[list[int]], 
+            list[int],
+            ]:
 
     max_token = logits.index(max(logits))
     for i in range(len(logits)):
         logits[i] = float("-inf")
 
-    function_set = set()
+    if res in function_ids:
+        return (logits, function_ids, res)
     for item in function_ids:
-        for token in item:
-            function_set.add(token)
-
-    if max_token in function_set:
-        logits[max_token] = float("+inf")
-    return (logits)
+        if max_token in item:
+            res.append(max_token)
+            logits[max_token] = float("+inf")
+    return (logits, function_ids, res)
 
 
 def get_function_name(
@@ -92,7 +101,6 @@ def get_function_name(
             ]
 
         function_name = get_response(model, temp_prompt[0], all_function_name)
-
         result.append(
             {
                 "prompt": prompt["prompt"],

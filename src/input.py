@@ -1,17 +1,17 @@
-from pydantic import BaseModel, TypeAdapter
+from pydantic import BaseModel, TypeAdapter, Field
 from typing import Any
 import json
 
 
 class FunctionCalling(BaseModel):
-    name: str
-    description: str
+    name: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
     parameters: dict[Any, Any]
     returns: dict[Any, Any]
 
 
 class Prompt(BaseModel):
-    prompt: str
+    prompt: str = Field(..., min_length=1)
 
 
 def load_json(file_path: str) -> list[dict[Any, Any]]:
