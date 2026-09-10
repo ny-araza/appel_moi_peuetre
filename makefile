@@ -9,7 +9,7 @@ export UV_CACHE_DIR=$(UV_CACHE)
 export HF_HOME=$(HF_CACHE)
 PY_VENV = .venv/bin/python
 
-all: $(TARGET)
+all: $(TARGET) install
 
 $(TARGET): $(TOML)
 	touch $(TARGET)

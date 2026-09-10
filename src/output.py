@@ -16,6 +16,8 @@ def validate_json(res_json: list[dict[Any, Any]]) -> bool:
         adapter = TypeAdapter(list[Output])
         adapter.validate_json(json_parse)
         return True
+    except KeyboardInterrupt:
+        raise KeyboardInterrupt()
     except ValidationError as e:
         for error in e.errors():
             print(error["msg"])

@@ -1,10 +1,14 @@
-import sys
-from .utils import get_function_name  # type: ignore
-from llm_sdk import Small_LLM_Model  # type: ignore
-from .parse import parse  # type: ignore
-from .output import generate_json_file  # type: ignore
-from .input import check_input  # type: ignore
-
+try:
+    import sys
+    from .utils import get_function_name  # type: ignore
+    from llm_sdk import Small_LLM_Model  # type: ignore
+    from .parse import parse  # type: ignore
+    from .output import generate_json_file  # type: ignore
+    from .input import check_input  # type: ignore
+except KeyboardInterrupt:
+    print("Please wait until the json is generated!!")
+except Exception as e:
+    print(f"An error occured: {e}")
 
 if __name__ == "__main__":
     try:
