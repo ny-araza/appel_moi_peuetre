@@ -20,7 +20,7 @@ $(TOML):
 	mkdir -p $(CALL_DIR)/src
 	touch $(CALL_DIR)/src/__main__.py
 
-install: $(TOML)
+install: $(TOML) sync
 	$(PY_VENV) -m pip install uv pip
 
 sync:
