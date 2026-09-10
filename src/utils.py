@@ -1,7 +1,7 @@
 from llm_sdk import Small_LLM_Model  # type: ignore
-from .parse import read_file  # type: ignore
+from .parse import read_file
 from typing import Any
-from .parameters import get_parameters  # type: ignore
+from .parameters import get_parameters
 
 
 def get_response(
