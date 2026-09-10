@@ -14,5 +14,7 @@ if __name__ == "__main__":
             result = get_function_name(model, config)
             generate_json_file(config["output"], result)
             print("Generation json done!!")
+    except KeyboardInterrupt:
+        print("Please wait until the end!!")
     except Exception as e:
         print(f"An error occured: {e}")

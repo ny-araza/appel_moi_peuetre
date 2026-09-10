@@ -21,7 +21,7 @@ $(TOML):
 	touch $(CALL_DIR)/src/__main__.py
 
 install: $(TOML) sync
-	$(PY_VENV) -m pip install uv pip
+	@echo "Installation done"
 
 sync:
 	@uv add --editable $(LLM_SDK_DIR) && uv sync
@@ -45,6 +45,8 @@ fclean: clean
 	rm -rf $(TARGET)
 	rm -rf $(CALL_DIR)/src/__pycache*
 	rm -rf $(CALL_DIR)/.venv
+	rm -rf $(CALL_DIR)/.mypy_cache
+	rm -rf $(CALL_DIR)/data/output
 	rm -rf $(TARGET)
 
 re: fclean all
