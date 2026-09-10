@@ -2,6 +2,7 @@ from pydantic import BaseModel, TypeAdapter
 from typing import Any
 import json
 
+
 class FunctionCalling(BaseModel):
     name: str
     description: str
@@ -15,7 +16,7 @@ class Prompt(BaseModel):
 
 def load_json(file_path: str) -> list[dict[Any, Any]]:
     with open(file_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+        data: list[dict[Any, Any]] = json.load(f)
     return data
 
 
@@ -42,6 +43,7 @@ def check_function_json(file_path: str) -> bool:
 
 
 def check_input(config: dict[str, Any]) -> bool:
-    if check_prompt_json(config["input"]) and check_function_json(config["functions_definition"]):
+    if check_prompt_json(config["input"]) and \
+            check_function_json(config["functions_definition"]):
         return True
     return False
