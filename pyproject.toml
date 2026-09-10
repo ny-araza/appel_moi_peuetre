@@ -12,5 +12,3 @@ dependencies = [
     "mypy==2.3.1",
 ]
 
-[tool.uv.sources]
-llm-sdk = { path = "../../../home/ny-araza/goinfre/appel_moi_peuetre/llm_sdk", editable = true }
