@@ -4,6 +4,15 @@ import os
 
 
 def check_flag_valid(argv: list[str]) -> bool:
+    """Check if the flag in input is allowed 
+    (--input, --output ,--function_definition)
+        
+        Args:
+            argv (list[str]): The input flag
+
+        Returns:
+            bool: True is the flag is valid and false if its not
+    """
     flag_valid = ["--input", "--output", "--functions_definition"]
     cpt: int = 0
     if len(argv) > 0:
@@ -19,6 +28,14 @@ def check_flag_valid(argv: list[str]) -> bool:
 
 
 def parse(arguments: list[str]) -> dict[str, Any]:
+    """Get all the flag in input and stock with its value in a dict
+            
+        Args:
+            arguments (list[str]): The input flag
+
+        Returns:
+            dict[str, Any]: The flag with its value
+    """
     res: dict[str, Any] = {}
     current_dir = os.path.abspath(os.getcwd())
     output_dir = current_dir + "/data/output"
@@ -64,11 +81,3 @@ def parse(arguments: list[str]) -> dict[str, Any]:
 
     return res
 
-
-def read_file(file: str) -> list[dict[Any, Any]]:
-    data: list[dict[Any, Any]] = []
-
-    with open(file) as fd:
-        data = json.load(fd)
-
-    return data
