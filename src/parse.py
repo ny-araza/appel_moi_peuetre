@@ -81,3 +81,19 @@ def parse(arguments: list[str]) -> dict[str, Any]:
 
     return res
 
+
+def read_file(file: str) -> list[dict[Any, Any]]:
+    """read the JSON file a set it into a varable
+                
+        Args:
+            file (str): The JSON filepath
+
+        Returns:
+            list[dict[Any, Any]]: The JSON read
+    """
+    data: list[dict[Any, Any]] = []
+
+    with open(file) as fd:
+        data = json.load(fd)
+
+    return data

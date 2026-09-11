@@ -13,5 +13,10 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-llm-sdk = { path = "../../../home/ny-araza/goinfre/appel_moi_peuetre/llm_sdk", editable = true }
+llm-sdk = { workspace = true, editable = true }
+
+[tool.uv.workspace]
+members = [
+    "llm_sdk",
+]
 

@@ -8,6 +8,12 @@ resolution-markers = [
     "python_full_version < '3.12'",
 ]
 
+[manifest]
+members = [
+    "appel-moi-peuetre",
+    "llm-sdk",
+]
+
 [[package]]
 name = "annotated-types"
 version = "0.8.0"
@@ -33,7 +39,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "flake8", specifier = "==7.3.0" },
-    { name = "llm-sdk", editable = "../../../home/ny-araza/goinfre/appel_moi_peuetre/llm_sdk" },
+    { name = "llm-sdk", editable = "llm_sdk" },
     { name = "mypy", specifier = "==2.3.1" },
     { name = "numpy" },
     { name = "pydantic" },
@@ -560,7 +566,7 @@ wheels = [
 [[package]]
 name = "llm-sdk"
 version = "0.1.0"
-source = { editable = "../../../home/ny-araza/goinfre/appel_moi_peuetre/llm_sdk" }
+source = { editable = "llm_sdk" }
 dependencies = [
     { name = "flake8" },
     { name = "huggingface-hub" },
