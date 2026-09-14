@@ -41,6 +41,9 @@ run:
 clean:
 	@uv cache clean && rm -rf $(HF_CACHE)
 
+debug: install
+	uv run $(PY_VENV) -m pdb $(CALL_DIR)/src/__main__.py
+
 fclean: clean
 	rm -rf $(TARGET)
 	rm -rf $(CALL_DIR)/src/__pycache*
