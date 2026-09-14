@@ -26,7 +26,6 @@ install: $(TOML) sync
 sync:
 	@uv add --editable $(LLM_SDK_DIR) && uv sync
 
-
 lint:
 	@$(PY_VENV) -m flake8 . --exclude=.venv/,./llm_sdk/  && $(PY_VENV) -m mypy .  --warn-return-any \
 	--warn-unused-ignores --ignore-missing-imports \
