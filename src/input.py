@@ -6,7 +6,7 @@ import json
 class FunctionCalling(BaseModel):
     """Represents the input model (function calling).
 
-        This class allows you to validate that the 
+        This class allows you to validate that the
         function calling.json is a valid JSON file.
 
         Attributes:
@@ -25,11 +25,11 @@ class FunctionCalling(BaseModel):
 class Prompt(BaseModel):
     """Represents the input model (prompt)
 
-        This class allows you to validate that the 
+        This class allows you to validate that the
         prompt.json is a valid JSON file.
 
         Attributes:
-            prompt (str): The prompt 
+            prompt (str): The prompt
     """
     prompt: str = Field(..., min_length=1)
 
@@ -50,7 +50,7 @@ def load_json(file_path: str) -> list[dict[Any, Any]]:
 
 def check_prompt_json(file_path: str) -> bool:
     """Check if the prompt JSON is a valid JSON
-    
+
         Args:
             file_path (str): the filepath of the JSON
 
@@ -69,7 +69,7 @@ def check_prompt_json(file_path: str) -> bool:
 
 def check_function_json(file_path: str) -> bool:
     """Check if the function_calling JSON is a valid JSON
-    
+
         Args:
             file_path (str): the filepath of the JSON
 
@@ -88,7 +88,7 @@ def check_function_json(file_path: str) -> bool:
 
 def check_input(config: dict[str, Any]) -> bool:
     """Check the both input
-        
+
         Args:
             config (dict[str, Any]): All parameters
 

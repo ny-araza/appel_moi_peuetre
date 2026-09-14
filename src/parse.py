@@ -4,9 +4,9 @@ import os
 
 
 def check_flag_valid(argv: list[str]) -> bool:
-    """Check if the flag in input is allowed 
+    """Check if the flag in input is allowed
     (--input, --output ,--function_definition)
-        
+
         Args:
             argv (list[str]): The input flag
 
@@ -29,7 +29,7 @@ def check_flag_valid(argv: list[str]) -> bool:
 
 def parse(arguments: list[str]) -> dict[str, Any]:
     """Get all the flag in input and stock with its value in a dict
-            
+
         Args:
             arguments (list[str]): The input flag
 
@@ -84,7 +84,7 @@ def parse(arguments: list[str]) -> dict[str, Any]:
 
 def read_file(file: str) -> list[dict[Any, Any]]:
     """read the JSON file a set it into a varable
-                
+
         Args:
             file (str): The JSON filepath
 

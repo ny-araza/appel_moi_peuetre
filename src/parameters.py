@@ -7,7 +7,7 @@ def get_response(
         prompt: str,
         ) -> str:
     """Return the llm response to get parameters
-    
+
         Args:
             model (Small_LLM_Model): The llm model
             prompt (str): the prompt
@@ -35,7 +35,7 @@ def parse_parameters(
         parameters: str,
         function: dict[Any, Any]
         ) -> dict[Any, Any]:
-    """Trim the LLM response 
+    """Trim the LLM response
 
         Args:
             parameters (str): the LLM response that will be trim
@@ -65,7 +65,7 @@ def cast_parameters(
         function: dict[Any, Any]
         ) -> dict[Any, Any]:
     """Cast the value of parameters
-    
+
         Args:
             parameters (str): the LLM response that will be trim
             function (dict[Any, Any]): The function
@@ -90,7 +90,7 @@ def get_parameters(
         list_functions: list[dict[Any, Any]]
         ) -> list[dict[Any, Any]]:
     """Get all the parameters from each prompt
-        
+
         Args:
             model (Small_LLM_Model): The LLM model
             res_json (list[dict[Any, Any]]): The output json

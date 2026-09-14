@@ -6,8 +6,8 @@ import os
 
 class Output(BaseModel):
     """Represents the Output model.
-    
-        This class allows you to validate that the 
+
+        This class allows you to validate that the
         Output is a valid JSON file.
 
         Attributes:
@@ -44,7 +44,7 @@ def validate_json(res_json: list[dict[Any, Any]]) -> bool:
 
 def generate_json_file(filename: str, res_json: list[dict[Any, Any]]) -> None:
     """Generate the function_calling_results.json
-    
+
         Args:
             filename (str): The output path
             res_json (list[dict[Any, Any]]): the output json

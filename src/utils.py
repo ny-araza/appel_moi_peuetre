@@ -10,11 +10,11 @@ def get_response(
         functions_ids: list[list[int]]
         ) -> str:
     """Get the response from LLM (its return the function name)
-                
+
         Args:
             model (Small_LLM_Model): The llm model
             prompt (str): The prompt send to the llm
-            functions_ids: Numeric Representations of all the functions 
+            functions_ids: Numeric Representations of all the functions
 
         Returns:
             str: The function name
@@ -22,7 +22,7 @@ def get_response(
     input_ids = model.encode(prompt).tolist()[0]
     i = 0
     temp_res = ""
-    res = []
+    res: list[int] = []
     while i <= get_max_func_len(functions_ids):
         logits = model.get_logits_from_input_ids(input_ids)
         logits, functions_ids, res = check_func_in_logits(
@@ -38,7 +38,7 @@ def get_response(
 
 def parse_res(res: str) -> str:
     """Trim the llm response
-                
+
         Args:
             res (str): The llm response
 
@@ -58,7 +58,7 @@ def parse_res(res: str) -> str:
 
 def get_max_func_len(functions_name: list[list[int]]) -> int:
     """Get the max lentgh of the function name
-                
+
         Args:
             functions_name (list[list[int]]): List of the function name
 
@@ -78,23 +78,24 @@ def check_func_in_logits(
         function_ids: list[list[int]],
         res: list[int],
         ) -> tuple[
-            list[float], 
-            list[list[int]], 
+            list[float],
+            list[list[int]],
             list[int],
             ]:
     """Guide the llm to return only the function name
-                
+
         Args:
             logits (list[float]): the llm logits list
-            function_ids (list[list[int]]): numeric representation 
+            function_ids (list[list[int]]): numeric representation
             of the function name
             res (list[int]): The function name returned
 
         Returns:
             tuple[
-            list[float], 
-            list[list[int]], 
-            list[int]: return the logits, the function_ids and the res (function name)
+            list[float],
+            list[list[int]],
+            list[int]: return the logits, the function_ids
+            and the res (function name)
     """
     max_token = logits.index(max(logits))
     for i in range(len(logits)):
@@ -114,7 +115,7 @@ def get_function_name(
         config: dict[str, Any]
         ) -> list[dict[Any, Any]]:
     """Get all the function name from each prompt
-            
+
         Args:
             model (Small_LLM_Model): The LLM model
             config (dict[str, Any]): The input value in a dict
