@@ -205,6 +205,11 @@ To validate the implementation, I defined BaseModel schemas for both input and o
 ```bash
     uv run python -m src --input <input_file.json> --function_calling <function_definition.json> --output <output.json>
     # Run the projet with own parameters
+    # Need to change the uv cache dir and the huging face cache
+```
+```bash
+    export UV_CACHE_DIR=~/goinfre/uv_cache
+    export HF_HOME=~/goinfre/home
 ```
 
 # RESOURCES
