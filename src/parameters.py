@@ -1,6 +1,6 @@
 from llm_sdk import Small_LLM_Model  # type: ignore
 from typing import Any
-
+import json
 
 def get_response(
         model: Small_LLM_Model,
@@ -44,20 +44,9 @@ def parse_parameters(
         Returns:
             dict[Any, Any]: The parameters dict
     """
-    forbidden_character = " +-&%!*/?@\n'`"
-    res: dict[str, Any] = {}
-    temp = ""
-    for c in parameters:
-        if c in forbidden_character:
-            c = c.replace(c, "")
-        temp += c
-    tmp = temp[1:-1].split(",")
-    for t in tmp:
-        item = t.split(":")
-        res.update({
-            item[0].strip("\""): item[1].strip("\"")
-        })
-    return cast_parameters(res, function)
+    temp_params = json.loads(parameters)
+
+    return cast_parameters(temp_params, function)
 
 
 def cast_parameters(
@@ -73,14 +62,20 @@ def cast_parameters(
         Returns:
             dict[Any, Any]: The parameters dict with all value casted
     """
-    type_parameters = function["parameters"]
-    for item in parameters.items():
-        if not type_parameters[item[0]]["type"]:
+    type_parameters = function.get("parameters")
+    for key, value in list(parameters.items()):
+        if not type_parameters:
+            parameters.update({key: None})
+        if not type_parameters.get(key):
+            del parameters[key]
+            continue
+        if not type_parameters.get(key)["type"]:
             raise ValueError("Parameter must have a value")
-        if type_parameters[item[0]]["type"] == "number":
-            parameters.update({item[0]: float(item[1])})
-        if type_parameters[item[0]]["type"] == "bool":
-            parameters.update({item[0]: item[1].strip().lower() == "true"})
+        if type_parameters.get(key)["type"] == "number":
+            if value:
+                parameters.update({key: float(value)})
+        if type_parameters[key]["type"] == "bool":
+            parameters.update({key: value.strip().lower() == "true"})
     return parameters
 
 
@@ -109,10 +104,10 @@ def get_parameters(
                     f"You are a function calling argument extraction agent."
                     "Your task is to extract the arguments needed "
                     "to call the function..\n"
-                    f"FUNCTION: {function["name"]}\n"
-                    f"{function["description"]}"
-                    f"Function parameters: {function["parameters"]}\n "
-                    f"User request: {r["prompt"]}"
+                    f"FUNCTION: {function.get("name")}\n"
+                    f"{function.get("descriptions")}"
+                    f"Function parameters: {function.get("parameters")}\n "
+                    f"User request: {r.get("prompt")}"
                     "Rules:\n"
                     "Extract ONLY parameters that are "
                     "defined in the function parameters.\n"
