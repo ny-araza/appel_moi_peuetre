@@ -1,7 +1,7 @@
 *This project has been created as part of the 42 curriculum by ny-araza*
 
 # DESCRIPTION
-The project leverages Large Language Model (LLM) function calling for intent routing. Given a natural language prompt and a JSON schema defining available function signatures, the AI performs a semantic matching analysis to generate a structured JSON payload containing the relevant function selections and their extracted arguments.
+This project leverages the function call of the Large Language Model (LLM). From a natural language query and a JSON schema defining the available function signatures, the AI ​​performs a semantic correspondence analysis to generate a structured JSON payload containing the relevant functions and their extracted arguments.
 
 ## Algorithme explanation
 Since the required output schema consists of three keys (prompt, name, and parameters), the algorithm is structured into two main components:

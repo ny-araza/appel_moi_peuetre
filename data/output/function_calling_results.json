@@ -1,18 +1,17 @@
 [
   {
-    "prompt": "What is the sum of -2 and -3?",
+    "prompt": "What is the sum of -25 and 3?",
     "name": "fn_add_numbers",
     "parameters": {
-      "a": -2.0,
-      "b": -3.0
+      "a": -25.0,
+      "b": 3.0
     }
   },
   {
-    "prompt": "What is the sum of 265 and 345?",
-    "name": "fn_add_numbers",
+    "prompt": "What is the square root of -16?",
+    "name": "fn_get_square_root",
     "parameters": {
-      "a": 265.0,
-      "b": 345.0
+      "a": -16.0
     }
   }
 ]
