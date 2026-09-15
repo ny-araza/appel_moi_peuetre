@@ -1,7 +1,7 @@
 [project]
-name = "appel-moi-peuetre"
+name = "call_me_maybe"
 version = "0.1.0"
-description = "Add your description here"
+description = "Projet that use LLM for generating valid JSON"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
