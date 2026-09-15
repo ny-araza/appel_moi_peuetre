@@ -2,6 +2,7 @@ from llm_sdk import Small_LLM_Model  # type: ignore
 from typing import Any
 import json
 
+
 def get_response(
         model: Small_LLM_Model,
         prompt: str,
@@ -62,20 +63,21 @@ def cast_parameters(
         Returns:
             dict[Any, Any]: The parameters dict with all value casted
     """
-    type_parameters = function.get("parameters")
+    type_parameters: dict[str, Any] | None = function.get("parameters")
     for key, value in list(parameters.items()):
-        if not type_parameters:
+        if type_parameters:
+            if not type_parameters.get(key):
+                del parameters[key]
+                continue
+            if not type_parameters.get(key)["type"]:  # type: ignore
+                parameters.update({key: None})
+            if type_parameters.get(key)["type"] == "number":  # type: ignore
+                if value:
+                    parameters.update({key: float(value)})
+            if type_parameters[key]["type"] == "bool":
+                parameters.update({key: value.strip().lower() == "true"})
+        else:
             parameters.update({key: None})
-        if not type_parameters.get(key):
-            del parameters[key]
-            continue
-        if not type_parameters.get(key)["type"]:
-            raise ValueError("Parameter must have a value")
-        if type_parameters.get(key)["type"] == "number":
-            if value:
-                parameters.update({key: float(value)})
-        if type_parameters[key]["type"] == "bool":
-            parameters.update({key: value.strip().lower() == "true"})
     return parameters
 
 
