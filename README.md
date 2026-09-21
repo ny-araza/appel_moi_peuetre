@@ -42,6 +42,9 @@ Immediate Semantic Alignment: Direct, structured prompt design prevents misinter
         </td>
     </tbody>
 </table>
+
+**NB:** Its depend to the performace of the PC
+
 Evaluated on a test set of 11 prompts from the JSON file, the execution pipeline completed total generation in 2 minutes and 10 seconds, achieving a 90.9% success rate (10 out of 11 correct predictions).
 
 **NB:** The LLM may halucinate sometimes. If the LLM can't find the function name or parameters according to the prompt, he return null
