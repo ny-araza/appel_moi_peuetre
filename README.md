@@ -159,7 +159,7 @@ To validate the implementation, I defined BaseModel (pydantic) schemas for both 
 ```json
 [
   {
-    "prompt": "What is the sum of 2 and?",
+    "prompt": "What is the sum of 2 and 3?",
     "name": "fn_add_numbers",
     "parameters": {
       "a": 2.0,
@@ -170,8 +170,8 @@ To validate the implementation, I defined BaseModel (pydantic) schemas for both 
     "prompt": "What is the sum of 265  and 345?",
     "name": "fn_add_numbers",
     "parameters": {
-      "a": 2651212123123.0,
-      "b": 344561245.0
+      "a": 265.0,
+      "b": 345.0
     }
   }
 ]
