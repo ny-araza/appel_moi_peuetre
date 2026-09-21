@@ -10,7 +10,7 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "appel-moi-peuetre",
+    "call-me-maybe",
     "llm-sdk",
 ]
 
@@ -21,28 +21,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/5f/56/a8120250d128bed162cd73c76d45f6ef9991f3e068f62a8ee060afa3104a/annotated_types-0.8.0.tar.gz", hash = "sha256:13b2beaad985e05e2d6407ee4c4f35590b11f8d693a258a561055cac8f64cab7", size = 15893, upload-time = "2026-07-23T20:16:13.995Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/99/91/8acff4f5e50511b911bbccb72b8628a49c68ce14148cd9f6431094859a90/annotated_types-0.8.0-py3-none-any.whl", hash = "sha256:f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0", size = 13427, upload-time = "2026-07-23T20:16:12.938Z" },
-]
-
-[[package]]
-name = "appel-moi-peuetre"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "flake8" },
-    { name = "llm-sdk" },
-    { name = "mypy" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-    { name = "pydantic" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "flake8", specifier = "==7.3.0" },
-    { name = "llm-sdk", editable = "llm_sdk" },
-    { name = "mypy", specifier = "==2.3.1" },
-    { name = "numpy" },
-    { name = "pydantic" },
 ]
 
 [[package]]
@@ -107,6 +85,28 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/54/5b/8f3381e22b86e3bdb74898ea4f7a15b54cca308a63e9e02753f99d6dd4fe/ast_serialize-0.11.0-cp39-abi3-win32.whl", hash = "sha256:4c4c2df749d1dc6bba9a9e8cc4b5c3dfc39a351fbfe4ce22ca49c2d488c7a7ce", size = 1124421, upload-time = "2026-09-08T14:58:35.332Z" },
     { url = "https://files.pythonhosted.org/packages/3a/b0/1ddfbc7aec32df2ed87ad830ee55854ddeceb2e8a8fcfae9b6ed57be0b4b/ast_serialize-0.11.0-cp39-abi3-win_amd64.whl", hash = "sha256:dd3c69e27b1be3172880bce2867c359106c28c5909f1ca6154bb7bf89847c419", size = 1162052, upload-time = "2026-09-08T14:58:36.674Z" },
     { url = "https://files.pythonhosted.org/packages/34/0b/32f3c8162cb5b33f24bea94503dbdd6b55aee72d367d23a55f1338f3e1b7/ast_serialize-0.11.0-cp39-abi3-win_arm64.whl", hash = "sha256:eb22d9300e7a064fa8c45e2c1e568a4e36c4c91487ea0da5e7f589905365c866", size = 1134422, upload-time = "2026-09-08T14:58:38.267Z" },
+]
+
+[[package]]
+name = "call-me-maybe"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "flake8" },
+    { name = "llm-sdk" },
+    { name = "mypy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "flake8", specifier = "==7.3.0" },
+    { name = "llm-sdk", editable = "llm_sdk" },
+    { name = "mypy", specifier = "==2.3.1" },
+    { name = "numpy" },
+    { name = "pydantic" },
 ]
 
 [[package]]

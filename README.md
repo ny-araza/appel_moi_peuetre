@@ -1,9 +1,9 @@
 *This project has been created as part of the 42 curriculum by ny-araza*
 
 # DESCRIPTION
-This project leverages the function call of the Large Language Model (LLM). From a natural language query and a JSON schema defining the available function signatures, the AI ​​performs a semantic correspondence analysis to generate a structured JSON payload containing the relevant functions and their extracted arguments.
+This project use the function call of the Large Language Model (LLM). From a natural language query and a JSON schema defining the available function signatures, the AI ​​performs a correspondence analysis to generate a structured JSON containing the relevant functions and their extracted arguments.
 
-## Algorithme explanation
+## Algorithm explanation
 Since the required output schema consists of three keys (prompt, name, and parameters), the algorithm is structured into two main components:
 
 #### Function name retrieval
@@ -41,6 +41,8 @@ Immediate Semantic Alignment: Direct, structured prompt design prevents misinter
     </tbody>
 </table>
 Evaluated on a test set of 11 prompts from the JSON file, the execution pipeline completed total generation in 2 minutes and 10 seconds, achieving a 90.9% success rate (10 out of 11 correct predictions).
+
+**NB:** The LLM may halucinate sometimes. If the LLM can't find the function name or parameters according to the prompt, he return null
 
 ## Challenges faced
 The most challenging aspect of the project was designing an optimal constrained decoding strategy for function name extraction. The solution involved strict logit masking: setting all vocabulary logits to $-\infty$ while enabling only those corresponding to valid function names. This forces the LLM to output exclusively valid function names, completely eliminating hallucinations.
