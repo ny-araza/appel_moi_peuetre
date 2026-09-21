@@ -26,7 +26,7 @@ def get_response(
     while i <= get_max_func_len(functions_ids):
         logits = model.get_logits_from_input_ids(input_ids)
         logits, functions_ids, res = check_func_in_logits(
-            logits, functions_ids, res
+            model, logits, functions_ids, res
             )
         max_token = max(logits)
         token = logits.index(max_token)
@@ -74,6 +74,7 @@ def get_max_func_len(functions_name: list[list[int]]) -> int:
 
 
 def check_func_in_logits(
+        model: Small_LLM_Model,
         logits: list[float],
         function_ids: list[list[int]],
         res: list[int],
@@ -136,12 +137,20 @@ def get_function_name(
     var = '\n'.join(str_form)
     for prompt in prompt_list:
         temp_prompt = [
-                "You are going to treat "
-                "the following prompt by function "
-                "calling. Choose one from the functions name with its "
-                f"description listed below to answer the prompt:\n{var}\n"
-                f"The prompt is: {prompt["prompt"]}\n"
-                "The function name is : "
+                f"""Pick exactly ONE function name from the list below that answers the prompt.
+                Output only the function name. No explanation. If nothing fits, output: none
+
+                Functions:
+                {var}
+
+                Prompt: What is 1000 dollars at 5% over 3 years?
+                Answer: fn_calculate_compound_interest
+
+                Prompt: Open /tmp/data.txt using utf-8
+                Answer: fn_read_file
+
+                Prompt: {prompt["prompt"]}
+                Answer:"""
             ]
 
         function_name = get_response(model, temp_prompt[0], all_function_name)

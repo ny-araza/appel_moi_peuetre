@@ -191,7 +191,7 @@ To validate the implementation, I defined BaseModel (pydantic) schemas for both 
 ```
 ```bash
     make sync
-    # Update package if a new one is added
+    # syncronize the venv package to the uv.lock
 ```
 ```bash
     make install

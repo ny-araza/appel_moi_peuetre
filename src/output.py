@@ -57,6 +57,7 @@ def generate_json_file(filename: str, res_json: list[dict[Any, Any]]) -> None:
             else:
                 outputpath = filename
         if os.path.isdir(filename):
+            
             outputpath = os.path.join(
                 filename,
                 "function_calling_results.json"
