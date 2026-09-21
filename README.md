@@ -7,8 +7,8 @@ This project use the function call of the Large Language Model (LLM). From a nat
 Since the required output schema consists of three keys (prompt, name, and parameters), the algorithm is structured into two main components:
 
 #### Function name retrieval
-To completely eliminate hallucinations and restrict the LLM output strictly to valid function names, constrained logit masking is applied:
-Logit Extraction & Masking: Capture the model's top logits and mask non-allowed token logits by setting them to -inf.
+To completely eliminate hallucinations and restrict the LLM output strictly to valid function names, constrained logit decoding is applied:
+Logit Extraction : Capture the model's top logits and mask non-allowed token logits by setting them to -inf.
 Vocabulary Alignment: Encode all valid function names defined in function_definition.
 Constrained Matching: Compare the model's highest logit predictions against the encoded valid function names, retaining the candidate with the highest logit score.
 
@@ -17,12 +17,11 @@ This mechanism ensures that the model can only select a function name that stric
 #### Parameter Extraction
 To retrieve function arguments conforming to the schema in function_calling.json, a targeted prompt instructs the model to output parameters as a JSON object (dictionary).
 To optimize output length and prevent model chatter:
-Early Stopping / Forced Termination: Generation is immediately halted as soon as the model emits a closing brace '}'.
-Token Optimization: Stopping at the closing bracket prevents the LLM from generating trailing text, redundant explanations, or malformed JSON extensions.
+Forced Termination: Generation is immediately halted as soon as the model emits a closing brace '}'.
 
 ## Design decisions
 The overall reliability of the extraction pipeline depends heavily on prompt construction:
-Explicit Instructions: Eliminates ambiguity to ensure deterministic, zero-error data extraction.
+Explicit Instructions: Eliminates ambiguity to ensure deterministic, no halucination
 Immediate Semantic Alignment: Direct, structured prompt design prevents misinterpretation and reduces parsing failures during LLM execution.
 
 ## Performance analysis
@@ -48,7 +47,7 @@ Evaluated on a test set of 11 prompts from the JSON file, the execution pipeline
 The most challenging aspect of the project was designing an optimal constrained decoding strategy for function name extraction. The solution involved strict logit masking: setting all vocabulary logits to $-\infty$ while enabling only those corresponding to valid function names. This forces the LLM to output exclusively valid function names, completely eliminating hallucinations.
 
 ## Testing strategy
-To validate the implementation, I defined BaseModel schemas for both input and output structures. Using JSON schema validation (validate_json), the pipeline strictly enforces type checking and structural compliance—raising an explicit error if a payload fails to match the expected format.
+To validate the implementation, I defined BaseModel (pydantic) schemas for both input and output structures. Using JSON schema validation (validate_json), the pipeline strictly enforces type checking and structural compliance—raising an explicit error if a payload fails to match the expected format.
 
 ## Exemple usage
 ```bash
