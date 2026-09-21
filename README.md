@@ -1,16 +1,19 @@
 *This project has been created as part of the 42 curriculum by ny-araza*
 
 # DESCRIPTION
-This project use the function call of the Large Language Model (LLM). From a natural language query and a JSON schema defining the available function signatures, the AI ​​performs a correspondence analysis to generate a structured JSON containing the relevant functions and their extracted arguments.
+This project is about of using the function call of the Large Language Model (LLM). From a natural language query and a JSON schema defining the available function signatures, the AI ​​performs a correspondence analysis to generate a structured JSON containing the relevant functions and their extracted arguments.
 
 ## Algorithm explanation
 Since the required output schema consists of three keys (prompt, name, and parameters), the algorithm is structured into two main components:
 
 #### Function name retrieval
 To completely eliminate hallucinations and restrict the LLM output strictly to valid function names, constrained logit decoding is applied:
-Logit Extraction : Capture the model's top logits and mask non-allowed token logits by setting them to -inf.
-Vocabulary Alignment: Encode all valid function names defined in function_definition.
-Constrained Matching: Compare the model's highest logit predictions against the encoded valid function names, retaining the candidate with the highest logit score.
+
+**Logit Extraction** : Capture the model's top logits and mask non-allowed token logits by setting them to -inf.
+
+**Vocabulary Alignment** : Encode all valid function names defined in function_definition.
+
+**Constrained Matching** : Compare the model's highest logit predictions against the encoded valid function names, retaining the candidate with the highest logit score.
 
 This mechanism ensures that the model can only select a function name that strictly exists within the provided function definitions.
 
