@@ -10,6 +10,7 @@ dependencies = [
     "numpy",
     "flake8==7.3.0",
     "mypy==2.3.1",
+    "colorama>=0.4.6",
 ]
 
 [tool.uv.sources]

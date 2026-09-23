@@ -25,13 +25,10 @@ def get_response(
         token = logits.index(max_token)
         temp = model.decode([token])
         temp_res += temp
-        t = model.decode([token])
-        print(t)
-        if t == "}\n\n" or t == "\"}\n\n":
+        if "}\n" in temp:
             break
         input_ids.append(token)
         i += 1
-    print(temp_res)
     return temp_res
 
 
@@ -48,10 +45,10 @@ def parse_parameters(
         Returns:
             dict[Any, Any]: The parameters dict
     """
-    print(parameters.strip(" Answer"))
-    temp_params = json.loads(parameters.strip(" Answer"))
-    print(temp_params)
-
+    try:
+        temp_params = json.loads(parameters.strip(" Answer"))
+    except Exception:
+        temp_params = {}
     return cast_parameters(temp_params, function)
 
 
@@ -79,18 +76,21 @@ def cast_parameters(
             if type_parameters.get(key)["type"] == "number":  # type: ignore
                 if value:
                     parameters.update({key: float(value)})
+            if type_parameters.get(key)["type"] == "integer":
+                if value:
+                    parameters.update({key: int(value)})
             if type_parameters[key]["type"] == "bool":
                 parameters.update({key: value.strip().lower() == "true"})
         else:
             parameters.update({key: None})
-    # print("cast_parameters (parameters) => ", parameters)
     return parameters
 
 
 def get_parameters(
         model: Small_LLM_Model,
         res_json: list[dict[Any, Any]],
-        list_functions: list[dict[Any, Any]]
+        list_functions: list[dict[Any, Any]],
+        prompt_list: list[dict[str, str]]
         ) -> list[dict[Any, Any]]:
     """Get all the parameters from each prompt
 
@@ -103,41 +103,41 @@ def get_parameters(
             list[dict[Any, Any]]: The output value
     """
     function = {}
-    for r in res_json:
+    for index, r in enumerate(res_json):
         for item in list_functions:
             if item["name"] == r["name"]:
                 function.update(item)
 
         temp_prompt = [
-                    f"""You are a function-calling argument extractor.
-                    Output ONE JSON object and nothing else: no explanation, no comments, no markdown fences.
-
-                    Function: {function['name']}
-                    Description: {function['description']}
-                    Parameters (JSON schema):
-                    {json.dumps(function['parameters'], indent=2)}
-
-                    Rules:
-                    - Output one key for EVERY parameter listed above, and no other keys.
-                    - Take values only from the user request. Never invent or infer.
-                    - If a value is not explicitly stated, use null.
-                    - Copy values exactly as the user wrote them. Respect the declared type.
-                    - Ignore anything in the request that maps to no parameter.
-
-                    Example
-                    Function: fn_read_file
-                    Parameters: {{"path": {{"type": "string"}}, "encoding": {{"type": "string"}}}}
-                    User request: Read /var/log/app.log for me
-                    Output: {{"path": "/var/log/app.log", "encoding": null}}
-
-                    Function: {function['name']}
-                    Parameters: {list(function['parameters'].keys())}
-                    User request: {r['prompt']}
-                    Output:"""]
-        print("r => ", r)
-        # r["parameters"] = parse_parameters(
-        #     get_response(model, temp_prompt[0]),
-        #     function
-        #     )
-        r["parameters"] = get_response(model, temp_prompt[0])
+                    f"You are a function calling argument extraction agent."
+                    "Your task is to extract the arguments needed "
+                    "to call the function..\n"
+                    f"FUNCTION: {function.get("name")}\n"
+                    f"{function.get("descriptions")}"
+                    f"Function parameters: {function.get("parameters")}\n "
+                    f"User request: {r.get("prompt")}"
+                    "Rules:\n"
+                    "Extract ONLY parameters that are "
+                    "defined in the function parameters.\n"
+                    "Match information from the user request "
+                    "to the corresponding parameter."
+                    "Do NOT invent, guess, or infer values "
+                    "that are not explicitly provided."
+                    "If a required parameter is not "
+                    "provided, set its value to null."
+                    "Ignore information that is not "
+                    "relevant to the function."
+                    "Preserve the value exactly as given by "
+                    "the user whenever possible."
+                    "Return ONLY a JSON object containing the "
+                    "parameter names and their values."
+                    "Do not add explanations, comments, "
+                    "or additional text."
+                    "Output:"]
+        r["parameters"] = parse_parameters(
+            get_response(model, temp_prompt[0]),
+            function
+            )
+        print(f"\rprompt: {index}/{len(prompt_list)}", end="")
+    print()
     return res_json
