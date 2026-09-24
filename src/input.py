@@ -1,4 +1,4 @@
-from pydantic import BaseModel, TypeAdapter, Field
+from pydantic import BaseModel, TypeAdapter, Field, ValidationError
 from typing import Any
 import json
 
@@ -62,8 +62,9 @@ def check_prompt_json(file_path: str) -> bool:
         adapter_prompt = TypeAdapter(list[Prompt])
         adapter_prompt.validate_json(json.dumps(prompt))
         return True
-    except Exception:
-        print("The input json is not a valid JSON")
+    except ValidationError as e:
+        for err in e.errors():
+            print(err["msg"])
         return False
 
 
@@ -81,8 +82,9 @@ def check_function_json(file_path: str) -> bool:
         adapter_function = TypeAdapter(list[FunctionCalling])
         adapter_function.validate_json(json.dumps(function_temp))
         return True
-    except Exception:
-        print("The functions definition is not a valid JSON")
+    except ValidationError as e:
+        for err in e.errors():
+            print(err["msg"])
         return False
 
 

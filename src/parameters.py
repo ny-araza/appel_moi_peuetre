@@ -103,7 +103,8 @@ def get_parameters(
             list[dict[Any, Any]]: The output value
     """
     function = {}
-    for index, r in enumerate(res_json):
+    print("Get the parameters:")
+    for index, r in enumerate(res_json, start=1):
         for item in list_functions:
             if item["name"] == r["name"]:
                 function.update(item)
@@ -138,6 +139,6 @@ def get_parameters(
             get_response(model, temp_prompt[0]),
             function
             )
-        print(f"\rprompt: {index}/{len(prompt_list)}", end="")
+        print(f"\r{index}/{len(prompt_list)}" , end="")
     print()
     return res_json

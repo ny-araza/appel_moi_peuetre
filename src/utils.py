@@ -138,7 +138,8 @@ def get_function_name(
         all_function_name.append(input_ids)
 
     var = '\n'.join(str_form)
-    for i, prompt in enumerate(prompt_list):
+    print("Get the function name:")
+    for i, prompt in enumerate(prompt_list, 1):
         temp_prompt = [
                 "You are a function-calling selection system.\n"
                 "Below is the list of available functions, with their exact name and description:\n\n"
@@ -160,7 +161,7 @@ def get_function_name(
             ]
 
         function_name = get_response(model, temp_prompt[0], all_function_name)
-        print(f"\r{i} function name found", end="")
+        print(f"\r{i}/{len(prompt_list)} ...", end="")
         if not function_name:
             result.append(
                 {
@@ -177,5 +178,6 @@ def get_function_name(
                 "parameters": {}
             }
         )
+    print()
     result = get_parameters(model, result, functions_definition, prompt_list)
     return result
