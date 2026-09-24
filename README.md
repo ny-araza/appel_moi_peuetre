@@ -20,7 +20,7 @@ This mechanism ensures that the model can only select a function name that stric
 #### Parameter Extraction
 To retrieve function arguments conforming to the schema in function_calling.json, a targeted prompt instructs the model to output parameters as a JSON object (dictionary).
 To optimize output length and prevent model chatter:
-Forced Termination: Generation is immediately halted as soon as the model emits a closing brace '}'.
+Forced Termination: Generation is immediately halted as soon as the model emits a closing brace '}/n'.
 
 ## Design decisions
 The overall reliability of the extraction pipeline depends heavily on prompt construction:
@@ -38,16 +38,16 @@ Immediate Semantic Alignment: Direct, structured prompt design prevents misinter
             90.9%
         </td>
         <td>
-            00:02:10.3
+            00:02:50.3
         </td>
     </tbody>
 </table>
 
 **NB:** Its depend to the performace of the PC
 
-Evaluated on a test set of 11 prompts from the JSON file, the execution pipeline completed total generation in 2 minutes and 10 seconds, achieving a 90.9% success rate (10 out of 11 correct predictions).
+Evaluated on a test set of 11 prompts from the JSON file, the execution pipeline completed total generation in 2 minutes and 50 seconds, achieving a 90.9% success rate (10 out of 11 correct predictions).
 
-**NB:** The LLM may halucinate sometimes. If the LLM can't find the function name or parameters according to the prompt, he return null
+**NB:** The LLM may halucinate sometimes. If the LLM can't find the function name or parameters according to the prompt, he return {} or the LLM hallucinate
 
 ## Challenges faced
 The most challenging aspect of the project was designing an optimal constrained decoding strategy for function name extraction. The solution involved strict logit masking: setting all vocabulary logits to $-\infty$ while enabling only those corresponding to valid function names. This forces the LLM to output exclusively valid function names, completely eliminating hallucinations.
@@ -58,7 +58,7 @@ To validate the implementation, I defined BaseModel (pydantic) schemas for both 
 ## Exemple usage
 ```bash
     make run
-    # run with default flag --input data/input/function_calling_tests.json --function_definition data/input/functions_definition.json --output data/output/function_calling_results.json
+    # run with default flag --input data/input/function_calling_tests.json --functions_definition data/input/functions_definition.json --output data/output/function_calling_results.json
 ```
 
 ### Input function_definition example
@@ -210,11 +210,12 @@ To validate the implementation, I defined BaseModel (pydantic) schemas for both 
     # Delete all cache and delete all file installed with (make install)
 ```
 ```bash
-    uv run python -m src --input <input_file.json> --function_calling <function_definition.json> --output <output.json>
+    uv run python -m src --input <input_file.json> --functions_definition <function_definition.json> --output <output.json>
     # Run the projet with own parameters
     # Need to change the uv cache dir and the huging face cache
 ```
 ```bash
+    # Before runing the uv run, run this command first
     export UV_CACHE_DIR=~/goinfre/uv_cache
     export HF_HOME=~/goinfre/home
 ```
@@ -224,9 +225,8 @@ To validate the implementation, I defined BaseModel (pydantic) schemas for both 
 <ul>
     <li><a href="https://blog.stephane-robert.info/docs/developper/programmation/python/json/">Module JSON:</a> Used for load and dump json file</li>
     <li><a href="https://pydantic.dev/docs/validation/2.9/api/pydantic/type_adapter">TynyAdapter</a>: Type adapters provide a flexible way to perform validation and serialization based on a Python type. </li>
+    <li>Peer learning: How the LLM generate valid answer</li>
 </ul>
 
 ### AI USAGE
 I most use AI to refine and optimize my prompt engineering.
-
-
