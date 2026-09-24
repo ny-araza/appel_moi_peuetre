@@ -50,7 +50,6 @@ def generate_json_file(filename: str, res_json: list[dict[Any, Any]]) -> None:
             res_json (list[dict[Any, Any]]): the output json
     """
     outputpath: str = ""
-    print(filename)
     if (validate_json(res_json)):
         if not os.path.exists(filename):
             if filename.split("/")[-2:] == ["data", "output"]:
