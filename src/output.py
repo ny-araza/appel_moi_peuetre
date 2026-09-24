@@ -50,6 +50,7 @@ def generate_json_file(filename: str, res_json: list[dict[Any, Any]]) -> None:
             res_json (list[dict[Any, Any]]): the output json
     """
     outputpath: str = ""
+    print(filename)
     if (validate_json(res_json)):
         if not os.path.exists(filename):
             if filename.split("/")[-2:] == ["data", "output"]:
@@ -57,14 +58,16 @@ def generate_json_file(filename: str, res_json: list[dict[Any, Any]]) -> None:
             else:
                 outputpath = filename
         if os.path.isdir(filename):
-            
             outputpath = os.path.join(
                 filename,
                 "function_calling_results.json"
                 )
         else:
             outputpath = filename
-        with open(outputpath, "w") as fd:
-            json.dump(res_json, fd, indent=2)
+        if outputpath and outputpath.split(".")[1].lower() == "json":
+            with open(outputpath, "w") as fd:
+                json.dump(res_json, fd, indent=2)
+        else:
+            raise Exception("Output file must be a json file")
     else:
         raise ValueError("JSON generated not valide")

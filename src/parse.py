@@ -70,7 +70,13 @@ def parse(arguments: list[str]) -> dict[str, Any]:
             elif arguments[i] == '--function_definition' and arguments[i + 1]:
                 res.update({"function_definition": arguments[i + 1]})
             cpt_option += 1
-
+    if output_path_dir != res.get("output"):
+        if len(res.get("output")) > 0:
+            temp = res.get("output").split(".")
+            if len(temp) != 2 or temp[1].lower() != "json":
+                raise Exception("Output file must be a JSON file")
+        else:
+            raise Exception("Output must have a value")
     if arguments and cpt_option > 3:
         raise Exception(
             "Arguments must be : "
