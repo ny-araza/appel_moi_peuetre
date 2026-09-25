@@ -76,7 +76,7 @@ def cast_parameters(
             if type_parameters.get(key)["type"] == "number":  # type: ignore
                 if value:
                     parameters.update({key: float(value)})
-            if type_parameters.get(key)["type"] == "integer":
+            if type_parameters.get(key)["type"] == "integer":  # type: ignore
                 if value:
                     parameters.update({key: int(value)})
             if type_parameters[key]["type"] == "bool":
@@ -139,6 +139,6 @@ def get_parameters(
             get_response(model, temp_prompt[0]),
             function
             )
-        print(f"\r{index}/{len(prompt_list)}" , end="")
+        print(f"\r{index}/{len(prompt_list)}", end="")
     print()
     return res_json
