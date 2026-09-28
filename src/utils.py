@@ -63,7 +63,9 @@ def parse_res(res: str, functions_name: list[str]) -> str:
 def trim_functions_name(old_name: str, functions_name: list[str]) -> str:
     if not old_name:
         return "not_found"
-    temp_old: str = old_name.split("fn")[1].strip("_ ")
+    temp_old = old_name
+    if "fn" in old_name:
+        temp_old = old_name.split("fn")[1].strip("_ ")
     for func_name in functions_name:
         if "fn" in func_name:
             temp_fun_name = func_name.split("fn")[1].strip("_ ")

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, TypeAdapter, Field, ValidationError
+from pydantic import BaseModel, TypeAdapter, Field, ValidationError, ConfigDict
 from typing import Any
 import json
 
@@ -14,8 +14,11 @@ class FunctionCalling(BaseModel):
             description (str): description of what the function does
             parameters (dict[str, Any]): List of the parameters of the function
             returns (dict[str, Any]): The return type of the function
+            model_config (native attribut fron pydantic that doesn't
+            allow an extra key for the model)
 
     """
+    model_config = ConfigDict(extra="forbid")
     name: str = Field(..., min_length=1)
     description: str = Field(..., min_length=1)
     parameters: dict[Any, Any]
@@ -30,7 +33,10 @@ class Prompt(BaseModel):
 
         Attributes:
             prompt (str): The prompt
+            model_config (native attribut fron pydantic that doesn't
+            allow an extra key for the model)
     """
+    model_config = ConfigDict(extra="forbid")
     prompt: str = Field(..., min_length=1)
 
 
