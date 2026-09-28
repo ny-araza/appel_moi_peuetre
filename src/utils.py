@@ -7,7 +7,8 @@ from .parameters import get_parameters
 def get_response(
         model: Small_LLM_Model,
         prompt: str,
-        functions_ids: list[list[int]]
+        functions_ids: list[list[int]],
+        functions_name: list[str]
         ) -> str:
     """Get the response from LLM (its return the function name)
 
@@ -26,17 +27,17 @@ def get_response(
     while i <= get_max_func_len(functions_ids) + 1:
         logits = model.get_logits_from_input_ids(input_ids)
         logits, functions_ids, res = check_func_in_logits(
-            model, logits, functions_ids, res
+            logits, functions_ids, res
             )
         max_token = max(logits)
         token = logits.index(max_token)
         input_ids.append(token)
         temp_res += model.decode([token])
         i += 1
-    return parse_res(temp_res)
+    return parse_res(temp_res, functions_name)
 
 
-def parse_res(res: str) -> str:
+def parse_res(res: str, functions_name: list[str]) -> str:
     """Trim the llm response
 
         Args:
@@ -56,7 +57,22 @@ def parse_res(res: str) -> str:
         new_res = f"fn{temp[1]}"
     if new_res[-2:] == "fn":
         return new_res[:-2]
-    return new_res
+    return trim_functions_name(new_res, functions_name)
+
+
+def trim_functions_name(old_name: str, functions_name: list[str]) -> str:
+    if not old_name:
+        return "not_found"
+    temp_old: str = old_name.split("fn")[1].strip("_ ")
+    for func_name in functions_name:
+        if "fn" in func_name:
+            temp_fun_name = func_name.split("fn")[1].strip("_ ")
+            if temp_fun_name == temp_old:
+                return func_name
+        else:
+            if temp_old in func_name:
+                return func_name
+    return old_name
 
 
 def get_max_func_len(functions_name: list[list[int]]) -> int:
@@ -77,7 +93,6 @@ def get_max_func_len(functions_name: list[list[int]]) -> int:
 
 
 def check_func_in_logits(
-        model: Small_LLM_Model,
         logits: list[float],
         function_ids: list[list[int]],
         res: list[int],
@@ -89,7 +104,8 @@ def check_func_in_logits(
     """Guide the llm to return only the function name
 
         Args:
-            logits (list[float]): the llm logits list
+            logits (list[float]): the llm logits listpositional arguments,
+            return the largest argument.
             function_ids (list[list[int]]): numeric representation
             of the function name
             res (list[int]): The function name returned
@@ -130,12 +146,14 @@ def get_function_name(
     functions_definition = read_file(config["functions_definition"])
     prompt_list = read_file(config["input"])
     str_form = []
-    all_function_name = []
+    all_function_name_ids = []
+    all_function_name: list[str] = []
     result: list[dict[Any, Any]] = []
     for function in functions_definition:
+        all_function_name.append(function["name"])
         str_form.append(f"{function["name"]}: {function["description"]}")
         input_ids = model.encode(function["name"]).tolist()[0]
-        all_function_name.append(input_ids)
+        all_function_name_ids.append(input_ids)
 
     var = '\n'.join(str_form)
     print("Get the function name:")
@@ -164,14 +182,20 @@ def get_function_name(
                 "Answer:"
             ]
 
-        function_name = get_response(model, temp_prompt[0], all_function_name)
+        function_name = get_response(
+            model, temp_prompt[0],
+            all_function_name_ids,
+            all_function_name
+            )
         print(f"\r{i}/{len(prompt_list)} ...", end="")
         if not function_name:
             result.append(
                 {
                             "prompt": prompt["prompt"],
                             "name": "not_found",
-                            "parameters": {}
+                            "parameters": {
+                                "not_found": {}
+                            }
                 }
             )
             continue
@@ -179,7 +203,9 @@ def get_function_name(
             {
                 "prompt": prompt["prompt"],
                 "name": function_name,
-                "parameters": {}
+                "parameters": {
+                    "not_found": {}
+                }
             }
         )
     print()
