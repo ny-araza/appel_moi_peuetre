@@ -65,6 +65,8 @@ def check_prompt_json(file_path: str) -> bool:
     """
     try:
         prompt = load_json(file_path)
+        if not prompt:
+            raise Exception("JSON List must have one key at least")
         adapter_prompt = TypeAdapter(list[Prompt])
         adapter_prompt.validate_json(json.dumps(prompt))
         return True
@@ -85,6 +87,8 @@ def check_function_json(file_path: str) -> bool:
     """
     try:
         function_temp = load_json(file_path)
+        if not function_temp:
+            raise Exception("JSON List must have one key at least")
         adapter_function = TypeAdapter(list[FunctionCalling])
         adapter_function.validate_json(json.dumps(function_temp))
         return True

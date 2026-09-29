@@ -2,7 +2,7 @@ from typing import Any
 import json
 from pydantic import BaseModel, TypeAdapter, ValidationError
 import os
-
+from pathlib import Path
 
 class Output(BaseModel):
     """Represents the Output model.
@@ -49,24 +49,10 @@ def generate_json_file(filename: str, res_json: list[dict[Any, Any]]) -> None:
             filename (str): The output path
             res_json (list[dict[Any, Any]]): the output json
     """
-    outputpath: str = ""
     if (validate_json(res_json)):
-        if not os.path.exists(filename):
-            if filename.split("/")[-2:] == ["data", "output"]:
-                os.mkdir(filename)
-            else:
-                outputpath = filename
-        if os.path.isdir(filename):
-            outputpath = os.path.join(
-                filename,
-                "function_calling_results.json"
-                )
-        else:
-            outputpath = filename
-        if outputpath and outputpath.split(".")[1].lower() == "json":
-            with open(outputpath, "w") as fd:
-                json.dump(res_json, fd, indent=2)
-        else:
-            raise Exception("Output file must be a json file")
+        path = Path(filename)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(filename, "w") as fd:
+            json.dump(res_json, fd, indent=2)
     else:
         raise ValueError("JSON generated not valide")

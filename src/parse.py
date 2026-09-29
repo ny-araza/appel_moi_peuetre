@@ -75,30 +75,15 @@ def parse(arguments: list[str]) -> dict[str, Any]:
                     f"{flag_authorized}"
                 )
             cpt_option += 1
-    if output_path_dir != res.get("output"):
-        if len(res.get("output", "")) > 0:
-            temp = res.get("output", "").split(".")
-            if len(temp) != 2 or temp[1].lower() != "json":
-                raise Exception("Output file must be a JSON file")
-        else:
-            raise Exception("Output must have a value")
-    if function_calling_path != res.get("input"):
-        if len(res.get("input", "")) > 0:
-            temp = res.get("input", "").split(".")
-            if len(temp) != 2 or temp[1].lower() != "json":
-                raise Exception("input file must be a JSON file")
-        else:
-            raise Exception("Output must have a value")
-    if function_definition_path != res.get("functions_definition"):
-        if len(res.get("functions_definition", "")) > 0:
-            temp = res.get("functions_definition", "").split(".")
-            if len(temp) != 2 or temp[1].lower() != "json":
-                raise Exception(
-                    "functions_definition "
-                    "file must be a JSON file"
-                    )
-        else:
-            raise Exception("Output must have a value")
+    if output_path_dir != res.get("output", ""):
+        if res.get("output", "")[-5:] != ".json":
+            raise Exception("Output file must be a JSON file")
+    if function_calling_path != res.get("input", ""):
+        if res.get("input", "")[-5:] != ".json":
+            raise Exception("Input file must be a JSON file")
+    if function_definition_path != res.get("functions_definition", ""):
+        if res.get("functions_definition", "")[-5:] != ".json":
+            raise Exception("Functions_definition file must be a JSON file")
     if arguments and cpt_option > 3:
         raise Exception(
             "Arguments must be : "
