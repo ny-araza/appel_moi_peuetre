@@ -32,6 +32,13 @@ def get_response(
     return temp_res
 
 
+def convert_str(obj) -> dict:
+    print(obj)
+    if isinstance(obj, dict):
+        return {k: str(v) for k, v in obj.items()}
+    return obj
+
+
 def parse_parameters(
         parameters: str,
         function: dict[Any, Any]
@@ -46,14 +53,12 @@ def parse_parameters(
             dict[Any, Any]: The parameters dict
     """
     try:
-        forbidden_character = "?!/@#$%^&<>;\'?`~"
-        new_params = ""
-        for charactere in parameters:
-            if charactere in forbidden_character:
-                new_params += "\"\""
-            else:
-                new_params += charactere
-        temp_params = json.loads(new_params.strip(" Answer"))
+        print(parameters)
+        temp_params = json.loads(
+            parameters.strip(" Answer"),
+            object_hook=convert_str
+        )
+        print(temp_params)
     except Exception:
         temp_params = {}
     return cast_parameters(temp_params, function)
@@ -82,7 +87,10 @@ def cast_parameters(
                 parameters.update({key: None})
             if type_parameters.get(key)["type"] == "number":  # type: ignore
                 if value:
-                    parameters.update({key: float(value)})
+                    try:
+                        parameters.update({key: float(value)})
+                    except ValueError:
+                        parameters.update({key: 0.0})
                 else:
                     parameters.update({key: 0.0})
             if type_parameters.get(key)["type"] == "integer":  # type: ignore
