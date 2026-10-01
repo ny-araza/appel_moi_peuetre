@@ -50,8 +50,18 @@ def load_json(file_path: str) -> list[dict[Any, Any]]:
             list[dict[Any, Any]]: The json load from the file
     """
     with open(file_path, 'r', encoding='utf-8') as f:
-        data: list[dict[Any, Any]] = json.load(f)
+        data: list[dict[Any, Any]] = json.load(f, object_pairs_hook=check_duplicate_key)
     return data
+
+
+def check_duplicate_key(item: dict) -> bool:
+    seen = {}
+    for key, value in item:
+        if key in seen:
+            raise Exception("Key must be unique")
+        else:
+            seen[key] = value
+    return seen
 
 
 def check_prompt_json(file_path: str) -> bool:

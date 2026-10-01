@@ -38,7 +38,7 @@ def parse(arguments: list[str]) -> dict[str, Any]:
     """
     res: dict[str, Any] = {}
     current_dir = os.path.abspath(os.getcwd())
-    output_dir = current_dir + "/data/output"
+    output_dir = current_dir + "/data/output/functions_calling_results.json"
     function_calling_path: str = os.path.join(
         current_dir, "data/input/function_calling_tests.json"
     )

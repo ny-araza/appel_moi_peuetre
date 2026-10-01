@@ -46,7 +46,14 @@ def parse_parameters(
             dict[Any, Any]: The parameters dict
     """
     try:
-        temp_params = json.loads(parameters.strip(" Answer"))
+        forbidden_character = "?!/@#$%^&<>;\'?`~"
+        new_params = ""
+        for charactere in parameters:
+            if charactere in forbidden_character:
+                new_params += "\"\""
+            else:
+                new_params += charactere
+        temp_params = json.loads(new_params.strip(" Answer"))
     except Exception:
         temp_params = {}
     return cast_parameters(temp_params, function)
@@ -76,6 +83,8 @@ def cast_parameters(
             if type_parameters.get(key)["type"] == "number":  # type: ignore
                 if value:
                     parameters.update({key: float(value)})
+                else:
+                    parameters.update({key: 0.0})
             if type_parameters.get(key)["type"] == "integer":  # type: ignore
                 if value:
                     parameters.update({key: int(value)})

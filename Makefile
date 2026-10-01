@@ -1,4 +1,4 @@
-GOINFRE = /home/$(USER)/goinfre
+GOINFRE = /home/$(USER)/sgoinfre
 UV_CACHE = $(GOINFRE)/uv_cache
 HF_CACHE = $(GOINFRE)/home
 CALL_DIR = $(CURDIR)
