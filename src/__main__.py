@@ -17,7 +17,7 @@ if __name__ == "__main__":
         config = parse(sys.argv[1:])
         if check_input(config):
             result = get_function_name(model, config)
-            generate_json_file(config["output"], result)
+            # generate_json_file(config["output"], result)
             print("Generation json done!!")
     except KeyboardInterrupt:
         print("Please wait until the end!!")

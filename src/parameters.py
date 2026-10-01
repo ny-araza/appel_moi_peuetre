@@ -1,7 +1,7 @@
 from llm_sdk import Small_LLM_Model  # type: ignore
 from typing import Any
 import json
-
+from .output import generate_json_file
 
 def get_response(
         model: Small_LLM_Model,
@@ -33,7 +33,6 @@ def get_response(
 
 
 def convert_str(obj) -> dict:
-    print(obj)
     if isinstance(obj, dict):
         return {k: str(v) for k, v in obj.items()}
     return obj
@@ -53,12 +52,10 @@ def parse_parameters(
             dict[Any, Any]: The parameters dict
     """
     try:
-        print(parameters)
         temp_params = json.loads(
             parameters.strip(" Answer"),
             object_hook=convert_str
         )
-        print(temp_params)
     except Exception:
         temp_params = {}
     return cast_parameters(temp_params, function)
@@ -96,7 +93,8 @@ def cast_parameters(
             if type_parameters.get(key)["type"] == "integer":  # type: ignore
                 if value:
                     parameters.update({key: int(value)})
-            if type_parameters[key]["type"] == "bool":
+            if type_parameters[key]["type"] == "bool" or \
+                type_parameters[key]["type"] == "boolean":
                 parameters.update({key: value.strip().lower() == "true"})
         else:
             parameters.update({key: None})
@@ -107,7 +105,8 @@ def get_parameters(
         model: Small_LLM_Model,
         res_json: list[dict[Any, Any]],
         list_functions: list[dict[Any, Any]],
-        prompt_list: list[dict[str, str]]
+        prompt_list: list[dict[str, str]],
+        config: dict[str, str]
         ) -> list[dict[Any, Any]]:
     """Get all the parameters from each prompt
 
@@ -156,6 +155,7 @@ def get_parameters(
             get_response(model, temp_prompt[0]),
             function
             )
+        generate_json_file(config["output"], res_json)
         print(f"\r{index}/{len(prompt_list)}", end="")
     print()
     return res_json

@@ -3,7 +3,6 @@ from .parse import read_file
 from typing import Any
 from .parameters import get_parameters
 
-
 def get_response(
         model: Small_LLM_Model,
         prompt: str,
@@ -161,6 +160,8 @@ def get_function_name(
     var = '\n'.join(str_form)
     print("Get the function name:")
     for i, prompt in enumerate(prompt_list, 1):
+        if prompt["prompt"].isspace():
+            raise Exception("Space only is not a valid prompt")
         temp_prompt = [
                 "You are a function-calling selection system.\n"
                 "Below is the list of available functions, with their "
@@ -208,5 +209,11 @@ def get_function_name(
             }
         )
     print()
-    result = get_parameters(model, result, functions_definition, prompt_list)
+    result = get_parameters(
+        model, result, 
+        functions_definition, 
+        prompt_list,
+        config
+    )
+
     return result
