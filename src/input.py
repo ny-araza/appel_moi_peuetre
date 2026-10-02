@@ -1,6 +1,6 @@
 from pydantic import BaseModel, TypeAdapter, Field, ValidationError, ConfigDict
 from typing import Any
-import json
+from json import load, dumps, JSONDecodeError
 
 
 class FunctionCalling(BaseModel):
@@ -50,7 +50,7 @@ def load_json(file_path: str) -> list[dict[Any, Any]]:
             list[dict[Any, Any]]: The json load from the file
     """
     with open(file_path, 'r', encoding='utf-8') as f:
-        data: list[dict[Any, Any]] = json.load(f, object_pairs_hook=check_duplicate_key)
+        data: list[dict[Any, Any]] = load(f, object_pairs_hook=check_duplicate_key)
     return data
 
 
@@ -74,11 +74,16 @@ def check_prompt_json(file_path: str) -> bool:
             bool: Return True if its a valid JSON a False if its not
     """
     try:
-        prompt = load_json(file_path)
+
+        try:
+            prompt = load_json(file_path)
+        except JSONDecodeError as e:
+            raise Exception(e)
+
         if not prompt:
             raise Exception("JSON List must have one key at least")
         adapter_prompt = TypeAdapter(list[Prompt])
-        adapter_prompt.validate_json(json.dumps(prompt))
+        adapter_prompt.validate_json(dumps(prompt))
         return True
     except ValidationError as e:
         for err in e.errors():
@@ -96,11 +101,16 @@ def check_function_json(file_path: str) -> bool:
             bool: Return True if its a valid JSON a False if its not
     """
     try:
-        function_temp = load_json(file_path)
+
+        try:
+            function_temp = load_json(file_path)
+        except JSONDecodeError as e:
+            raise Exception(e)
+
         if not function_temp:
-            raise Exception("JSON List must have one key at least")
+            raise ("JSON List must have one key at least")
         adapter_function = TypeAdapter(list[FunctionCalling])
-        adapter_function.validate_json(json.dumps(function_temp))
+        adapter_function.validate_json(dumps(function_temp))
         return True
     except ValidationError as e:
         for err in e.errors():

@@ -157,11 +157,13 @@ def get_function_name(
         input_ids = model.encode(function["name"]).tolist()[0]
         all_function_name_ids.append(input_ids)
 
+    for prompt in prompt_list:
+        if not prompt["prompt"].strip(" \t\n\a\b\v\f\r"):
+            raise Exception("Prompt not valid")
+
     var = '\n'.join(str_form)
     print("Get the function name:")
     for i, prompt in enumerate(prompt_list, 1):
-        if prompt["prompt"].isspace():
-            raise Exception("Space only is not a valid prompt")
         temp_prompt = [
                 "You are a function-calling selection system.\n"
                 "Below is the list of available functions, with their "
@@ -195,9 +197,9 @@ def get_function_name(
         if not function_name:
             result.append(
                 {
-                            "prompt": prompt["prompt"],
-                            "name": "not_found",
-                            "parameters": {}
+                    "prompt": prompt["prompt"],
+                    "name": "not_found",
+                    "parameters": {}
                 }
             )
             continue
