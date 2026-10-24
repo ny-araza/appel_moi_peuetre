@@ -1,0 +1,23 @@
+[project]
+name = "call_me_maybe"
+version = "0.1.0"
+description = "Projet that use LLM for generating valid JSON"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "llm-sdk",
+    "pydantic",
+    "numpy",
+    "flake8==7.3.0",
+    "mypy==2.3.1",
+    "colorama>=0.4.6",
+]
+
+[tool.uv.sources]
+llm-sdk = { workspace = true, editable = true }
+
+[tool.uv.workspace]
+members = [
+    "llm_sdk",
+]
+

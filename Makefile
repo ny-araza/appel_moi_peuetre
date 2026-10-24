@@ -1,0 +1,54 @@
+GOINFRE = /home/$(USER)/sgoinfre
+UV_CACHE = $(GOINFRE)/uv_cache
+HF_CACHE = $(GOINFRE)/home
+CALL_DIR = $(CURDIR)
+LLM_SDK_DIR = $(CALL_DIR)/llm_sdk
+TARGET = installed
+TOML = $(CALL_DIR)/pyproject.toml
+export UV_CACHE_DIR=$(UV_CACHE)
+export HF_HOME=$(HF_CACHE)
+PY_VENV = .venv/bin/python
+
+all: $(TARGET) install
+
+$(TARGET): $(TOML)
+	touch $(TARGET)
+
+$(TOML):
+	uv init
+	rm -rf $(CALL_DIR)/main.py
+	mkdir -p $(CALL_DIR)/src
+	touch $(CALL_DIR)/src/__main__.py
+
+install: $(TOML) sync
+	@echo "Installation done"
+
+sync:
+	@uv add --editable $(LLM_SDK_DIR) && uv sync
+
+lint:
+	@$(PY_VENV) -m flake8 . --exclude=.venv/,./llm_sdk/  && $(PY_VENV) -m mypy .  --warn-return-any \
+	--warn-unused-ignores --ignore-missing-imports \
+	--disallow-untyped-defs --check-untyped-defs --exclude .llm_sdk/
+
+lint-strict:
+	@$(PY_VENV) -m flake8 . --exclude=.venv/,./llm_sdk/  && $(PY_VENV) -m mypy . --strict --exclude .llm_sdk/
+
+run:
+	@uv run python -m src
+
+clean:
+	@uv cache clean && rm -rf $(HF_CACHE)
+
+debug: install
+	uv run $(PY_VENV) -m pdb $(CALL_DIR)/src/__main__.py
+
+fclean: clean
+	rm -rf $(TARGET)
+	rm -rf $(CALL_DIR)/src/__pycache*
+	rm -rf $(CALL_DIR)/.venv
+	rm -rf $(CALL_DIR)/.mypy_cache
+	rm -rf $(CALL_DIR)/data/output
+	rm -rf $(TARGET)
+
+re: fclean all

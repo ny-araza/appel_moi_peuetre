@@ -1,0 +1,8 @@
+.zed
+.venv
+__pycach*
+src/__pycach*
+installed
+main.py
+data/output
+data/output
