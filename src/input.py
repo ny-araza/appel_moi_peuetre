@@ -87,7 +87,10 @@ def check_prompt_json(file_path: str) -> bool:
         return True
     except ValidationError as e:
         for err in e.errors():
-            print(err["msg"])
+            print(
+                "An error occured: line "
+                f"{file_path}: key {err['loc'][1]}: {err["msg"]}"
+            )
         return False
 
 
@@ -114,7 +117,7 @@ def check_function_json(file_path: str) -> bool:
         return True
     except ValidationError as e:
         for err in e.errors():
-            print(err["msg"])
+            print(f"An error occured: {file_path}: key {err["loc"][1]}: {err["msg"]}")
         return False
 
 
