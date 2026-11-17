@@ -9,30 +9,18 @@ export UV_CACHE_DIR=$(UV_CACHE)
 export HF_HOME=$(HF_CACHE)
 PY_VENV = .venv/bin/python
 
-all: $(TARGET) install
+all: install
 
-$(TARGET): $(TOML)
-	touch $(TARGET)
-
-$(TOML):
-	uv init
-	rm -rf $(CALL_DIR)/main.py
-	mkdir -p $(CALL_DIR)/src
-	touch $(CALL_DIR)/src/__main__.py
-
-install: $(TOML) sync
-	@echo "Installation done"
-
-sync:
-	@uv add --editable $(LLM_SDK_DIR) && uv sync
+install:
+	@uv sync --python 3.10
 
 lint:
-	@$(PY_VENV) -m flake8 . --exclude=.venv/,./llm_sdk/  && $(PY_VENV) -m mypy .  --warn-return-any \
+	@uv run flake8 . --exclude=.venv/,./llm_sdk/  && uv run mypy .  --warn-return-any \
 	--warn-unused-ignores --ignore-missing-imports \
 	--disallow-untyped-defs --check-untyped-defs --exclude .llm_sdk/
 
 lint-strict:
-	@$(PY_VENV) -m flake8 . --exclude=.venv/,./llm_sdk/  && $(PY_VENV) -m mypy . --strict --exclude .llm_sdk/
+	@uv run flake8 . --exclude=.venv/,./llm_sdk/  && uv run mypy . --strict --exclude .llm_sdk/
 
 run:
 	@uv run python -m src
@@ -41,7 +29,7 @@ clean:
 	@uv cache clean && rm -rf $(HF_CACHE)
 
 debug: install
-	uv run $(PY_VENV) -m pdb $(CALL_DIR)/src/__main__.py
+	uv run pdb $(CALL_DIR)/src/__main__.py
 
 fclean: clean
 	rm -rf $(TARGET)

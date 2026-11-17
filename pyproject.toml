@@ -3,7 +3,7 @@ name = "call_me_maybe"
 version = "0.1.0"
 description = "Projet that use LLM for generating valid JSON"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = [
     "llm-sdk",
     "pydantic",
