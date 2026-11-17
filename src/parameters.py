@@ -7,7 +7,7 @@ def get_response(
         prompt: str,
         function: dict[str, Any],
         keys: list[str]
-        ) -> str:
+        ) -> dict[Any, Any]:
     """Return the llm response to get parameters
 
         Args:
@@ -20,6 +20,7 @@ def get_response(
     input_ids = model.encode(prompt).tolist()[0]
     i = 0
     temp_res = ""
+    params: dict[Any ,Any] = {}
     while i < 200:
         logits = model.get_logits_from_input_ids(input_ids)
         max_token = max(logits)
@@ -28,10 +29,11 @@ def get_response(
         temp_res += temp
         print(temp_res)
         if check_valid_params(temp_res, keys):
+            params = json.loads(temp_res)
             break
         input_ids.append(token)
         i += 1
-    return temp_res
+    return params
 
 def check_valid_params(temp_json: str, keys: list[str]) -> str:
     if "}" in temp_json:
@@ -55,6 +57,26 @@ def check_json_valid(temp_json: str) -> str:
         print(type(temp))
     except Exception:
         return temp_json
+
+def format_value(
+        params: dict[Any, Any],
+        function_params: dict[Any, Any]
+        ) -> dict[Any, Any]:
+    for key, value in params.items():
+        if function_params["parameters"][key]["type"] == "number":
+            try:
+                params[key] = int(value)
+            except ValueError:
+                params[key] = str(value)
+        elif function_params["parameters"][key]["type"] == "boolean" \
+            or function_params["parameters"][key]["type"] == "bool":
+                res: bool = False
+                if value.lower() == "true":
+                    res = True
+                params[key] = res
+        else:
+            params[key] = str(value)
+    return params
 
 def get_parameters(
         model: Small_LLM_Model,
@@ -97,6 +119,7 @@ def get_parameters(
         Output:"""
     ]
     temp_parameters = get_response(model, temp_prompt[0], function, keys_params)
-    print("JSON generated")
+
+    result = format_value(temp_parameters, function)
 
     return result
