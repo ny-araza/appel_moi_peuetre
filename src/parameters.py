@@ -27,7 +27,6 @@ def get_response(
         token = logits.index(max_token)
         temp = model.decode([token])
         temp_res += temp
-        print(temp_res)
         if check_valid_params(temp_res, keys):
             params = json.loads(temp_res)
             break
@@ -39,8 +38,6 @@ def check_valid_params(temp_json: str, keys: list[str]) -> str:
     if "}" in temp_json:
         try:
             params: dict[Any, Any] = json.loads(temp_json)
-            print(True)
-            print(len(list(params.keys())), len(keys))
             if len(list(params.keys())) == len(keys):
                 for k in list(params.keys()):
                     if k not in keys or not params[k]:
@@ -53,7 +50,6 @@ def check_valid_params(temp_json: str, keys: list[str]) -> str:
 def check_json_valid(temp_json: str) -> str:
     try:
         temp = json.loads(temp_json)
-        print(type(temp))
     except Exception:
         return temp_json
 
@@ -65,9 +61,14 @@ def format_value(
         try:
             if function_params["parameters"][key].get("type", "string") == "number":
                 try:
-                    params[key] = int(value)
+                    params[key] = float(value)
                 except ValueError:
                     params[key] = str(value)
+            if function_params["parameters"][key].get("type", "string") == "integer":
+                            try:
+                                params[key] = int(value)
+                            except ValueError:
+                                params[key] = str(value)
             elif function_params["parameters"][key].get("type", "string") == "boolean" \
                 or function_params["parameters"][key].get("type", "string") == "bool":
                     res: bool = False
@@ -101,7 +102,6 @@ def get_parameters(
         if item["name"] == function_name:
             function.update(item)
 
-    print("function ", function)
     if not function.get("parameters", ""):
         return {}
     result: dict[str, Any] = {}
