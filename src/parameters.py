@@ -44,10 +44,9 @@ def check_valid_params(temp_json: str, keys: list[str]) -> str:
             if len(list(params.keys())) == len(keys):
                 for k in list(params.keys()):
                     if k not in keys or not params[k]:
-                        print("Not all the keys in func keys")
                         return False
                 return True
-            return False
+            return True
         except Exception:
             return False
 
@@ -63,18 +62,21 @@ def format_value(
         function_params: dict[Any, Any]
         ) -> dict[Any, Any]:
     for key, value in params.items():
-        if function_params["parameters"][key]["type"] == "number":
-            try:
-                params[key] = int(value)
-            except ValueError:
+        try:
+            if function_params["parameters"][key].get("type", "string") == "number":
+                try:
+                    params[key] = int(value)
+                except ValueError:
+                    params[key] = str(value)
+            elif function_params["parameters"][key].get("type", "string") == "boolean" \
+                or function_params["parameters"][key].get("type", "string") == "bool":
+                    res: bool = False
+                    if value.lower() == "true":
+                        res = True
+                    params[key] = res
+            else:
                 params[key] = str(value)
-        elif function_params["parameters"][key]["type"] == "boolean" \
-            or function_params["parameters"][key]["type"] == "bool":
-                res: bool = False
-                if value.lower() == "true":
-                    res = True
-                params[key] = res
-        else:
+        except KeyError:
             params[key] = str(value)
     return params
 
@@ -99,6 +101,9 @@ def get_parameters(
         if item["name"] == function_name:
             function.update(item)
 
+    print("function ", function)
+    if not function.get("parameters", ""):
+        return {}
     result: dict[str, Any] = {}
 
     keys_params = list(function["parameters"].keys())
