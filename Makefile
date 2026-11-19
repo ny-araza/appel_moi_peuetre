@@ -12,7 +12,7 @@ PY_VENV = .venv/bin/python
 all: install
 
 install:
-	@uv sync --python 3.10
+	@uv sync
 
 lint:
 	@uv run flake8 . --exclude=.venv/,./llm_sdk/  && uv run mypy .  --warn-return-any \

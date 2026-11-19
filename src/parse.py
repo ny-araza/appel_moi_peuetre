@@ -1,16 +1,16 @@
+"""Parse the input from terminal."""
 from typing import Any
 import os
 
 
 def check_flag_valid(argv: list[str]) -> bool:
-    """Check if the flag in input is allowed
-    (--input, --output ,--function_definition)
+    """Check if the flag in input is allowed.
 
-        Args:
-            argv (list[str]): The input flag
+    Args:
+        argv (list[str]): The input flag
 
-        Returns:
-            bool: True is the flag is valid and false if its not
+    Returns:
+        bool: True is the flag is valid and false if its not
     """
     flag_valid = ["--input", "--output", "--functions_definition"]
     cpt: int = 0
@@ -27,13 +27,13 @@ def check_flag_valid(argv: list[str]) -> bool:
 
 
 def parse(arguments: list[str]) -> dict[str, Any]:
-    """Get all the flag in input and stock with its value in a dict
+    """Get all the flag in input and stock with its value in a dict.
 
-        Args:
-            arguments (list[str]): The input flag
+    Args:
+        arguments (list[str]): The input flag
 
-        Returns:
-            dict[str, Any]: The flag with its value
+    Returns:
+        dict[str, Any]: The flag with its value
     """
     res: dict[str, Any] = {}
     current_dir = os.path.abspath(os.getcwd())

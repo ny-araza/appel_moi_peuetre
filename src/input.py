@@ -1,3 +1,5 @@
+"""Input validation."""
+
 from pydantic import BaseModel, TypeAdapter, Field, ValidationError, ConfigDict
 from typing import Any
 from json import load, dumps, JSONDecodeError
@@ -6,18 +8,19 @@ from json import load, dumps, JSONDecodeError
 class FunctionCalling(BaseModel):
     """Represents the input model (function calling).
 
-        This class allows you to validate that the
-        function calling.json is a valid JSON file.
+    This class allows you to validate that the
+    function calling.json is a valid JSON file.
 
-        Attributes:
-            name (str): the function name
-            description (str): description of what the function does
-            parameters (dict[str, Any]): List of the parameters of the function
-            returns (dict[str, Any]): The return type of the function
-            model_config (native attribut fron pydantic that doesn't
-            allow an extra key for the model)
+    Attributes:
+        name (str): the function name
+        description (str): description of what the function does
+        parameters (dict[str, Any]): List of the parameters of the function
+        returns (dict[str, Any]): The return type of the function
+        model_config (native attribut fron pydantic that doesn't
+        allow an extra key for the model)
 
     """
+
     model_config = ConfigDict(extra="forbid")
     name: str = Field(..., min_length=1)
     description: str = Field(..., min_length=1)
@@ -26,35 +29,49 @@ class FunctionCalling(BaseModel):
 
 
 class Prompt(BaseModel):
-    """Represents the input model (prompt)
+    """Represents the input model (prompt).
 
-        This class allows you to validate that the
-        prompt.json is a valid JSON file.
+    This class allows you to validate that the
+    prompt.json is a valid JSON file.
 
-        Attributes:
-            prompt (str): The prompt
-            model_config (native attribut fron pydantic that doesn't
-            allow an extra key for the model)
+    Attributes:
+        prompt (str): The prompt
+        model_config (native attribut fron pydantic that doesn't
+        allow an extra key for the model)
     """
+
     model_config = ConfigDict(extra="forbid")
     prompt: str = Field(..., min_length=1)
 
 
 def load_json(file_path: str) -> list[dict[Any, Any]]:
-    """Load the json in the JSON file to assign it into a variable
+    """Load the json in the JSON file to assign it into a variable.
 
-        Args:
-            file_path (str): the filepath of the JSON
+    Args:
+        file_path (str): the filepath of the JSON
 
-        Returns:
-            list[dict[Any, Any]]: The json load from the file
+    Returns:
+        list[dict[Any, Any]]: The json load from the file
     """
     with open(file_path, 'r', encoding='utf-8') as f:
-        data: list[dict[Any, Any]] = load(f, object_pairs_hook=check_duplicate_key)
+        data: list[dict[Any, Any]] = load(
+            f, object_pairs_hook=check_duplicate_key)  # type: ignore
+
+    if not data:
+        raise Exception("No data found in the JSON file")
+
     return data
 
 
-def check_duplicate_key(item: dict) -> bool:
+def check_duplicate_key(item: dict[Any, Any]) -> dict[Any, Any]:
+    """Check the duplicate key before loading data from JSON file.
+
+    Args:
+        item (dict): dict item in the list of dict
+
+    Return:
+        bool: Contains duplicate or not
+    """
     seen = {}
     for key, value in item:
         if key in seen:
@@ -65,19 +82,21 @@ def check_duplicate_key(item: dict) -> bool:
 
 
 def check_prompt_json(file_path: str) -> bool:
-    """Check if the prompt JSON is a valid JSON
+    """Check if the prompt JSON is a valid JSON.
 
-        Args:
-            file_path (str): the filepath of the JSON
+    Args:
+        file_path (str): the filepath of the JSON
 
-        Returns:
-            bool: Return True if its a valid JSON a False if its not
+    Returns:
+        bool: Return True if its a valid JSON a False if its not
     """
     try:
 
         try:
             prompt = load_json(file_path)
-        except JSONDecodeError as e:
+        except JSONDecodeError:
+            raise Exception("Prompt json file is empty")
+        except Exception as e:
             raise Exception(e)
 
         if not prompt:
@@ -95,13 +114,13 @@ def check_prompt_json(file_path: str) -> bool:
 
 
 def check_function_json(file_path: str) -> bool:
-    """Check if the function_calling JSON is a valid JSON
+    """Check if the function_calling JSON is a valid JSON.
 
-        Args:
-            file_path (str): the filepath of the JSON
+    Args:
+        file_path (str): the filepath of the JSON
 
-        Returns:
-            bool: Return True if its a valid JSON a False if its not
+    Returns:
+        bool: Return True if its a valid JSON a False if its not
     """
     try:
 
@@ -111,24 +130,27 @@ def check_function_json(file_path: str) -> bool:
             raise Exception(e)
 
         if not function_temp:
-            raise ("JSON List must have one key at least")
+            raise Exception("JSON List must have one key at least")
         adapter_function = TypeAdapter(list[FunctionCalling])
         adapter_function.validate_json(dumps(function_temp))
         return True
     except ValidationError as e:
         for err in e.errors():
-            print(f"An error occured: {file_path}: key {err["loc"][1]}: {err["msg"]}")
+            print(
+                f"An error occured: {file_path}"
+                f": key {err["loc"][1]}: {err["msg"]}"
+            )
         return False
 
 
 def check_input(config: dict[str, Any]) -> bool:
-    """Check the both input
+    """Check the both input.
 
-        Args:
-            config (dict[str, Any]): All parameters
+    Args:
+        config (dict[str, Any]): All parameters
 
-        Returns:
-            bool: Return True if its a valid JSON a False if its not
+    Returns:
+        bool: Return True if its a valid JSON a False if its not
     """
     if check_prompt_json(config["input"]) and \
             check_function_json(config["functions_definition"]):

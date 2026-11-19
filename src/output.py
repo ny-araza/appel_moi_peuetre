@@ -1,33 +1,35 @@
+"""Validate Output JSON file."""
 from typing import Any
 import json
 from pydantic import BaseModel, TypeAdapter, ValidationError
-import os
 from pathlib import Path
+
 
 class Output(BaseModel):
     """Represents the Output model.
 
-        This class allows you to validate that the
-        Output is a valid JSON file.
+    This class allows you to validate that the
+    Output is a valid JSON file.
 
-        Attributes:
-            prompt (str): the prompt
-            name (str): The function name
-            parameters (dict[str, Any]): List of the parameters of the function
+    Attributes:
+        prompt (str): the prompt
+        name (str): The function name
+        parameters (dict[str, Any]): List of the parameters of the function
     """
+
     prompt: str
     name: str
     parameters: dict[Any, Any]
 
 
 def validate_json(res_json: list[dict[Any, Any]]) -> bool:
-    """Validate if the output is a JSON valid
+    """Validate if the output is a JSON valid.
 
-        Args:
-            res_json (list[dict[Any, Any]]): The output JSON list
+    Args:
+        res_json (list[dict[Any, Any]]): The output JSON list
 
-        Returns:
-            bool: Return True if its a valid JSON a False if its not
+    Returns:
+        bool: Return True if its a valid JSON a False if its not
     """
     try:
         json_parse = json.dumps(res_json)
@@ -43,11 +45,11 @@ def validate_json(res_json: list[dict[Any, Any]]) -> bool:
 
 
 def generate_json_file(filename: str, res_json: list[dict[Any, Any]]) -> None:
-    """Generate the function_calling_results.json
+    """Generate the function_calling_results.json.
 
-        Args:
-            filename (str): The output path
-            res_json (list[dict[Any, Any]]): the output json
+    Args:
+        filename (str): The output path
+        res_json (list[dict[Any, Any]]): the output json
     """
     if (validate_json(res_json)):
         path = Path(filename)

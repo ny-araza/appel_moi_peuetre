@@ -1,57 +1,18 @@
-from llm_sdk import Small_LLM_Model
+"""All function to retrieve the function name."""
+
+from llm_sdk import Small_LLM_Model  # type: ignore
 from typing import Any
 from .utils import read_file
 
 
-def parse_res(res: str, functions_name: list[str]) -> str:
-    """Trim the llm response
-
-        Args:
-            res (str): The llm response
-
-        Returns:
-            str: The value after trimed
-    """
-    forbidden_character = "!*/?@"
-    new_res: str = ""
-    for c in res:
-        if c in forbidden_character:
-            c = c.replace(c, "")
-        new_res += c
-    temp = new_res.split("fn")
-    if len(temp) > 2:
-        new_res = f"fn{temp[1]}"
-    if new_res[-2:] == "fn":
-        return new_res[:-2]
-    return trim_functions_name(new_res, functions_name)
-
-
-def trim_functions_name(old_name: str, functions_name: list[str]) -> str:
-    if not old_name:
-        return "not_found"
-    temp_old = old_name
-    if "fn" in old_name:
-        temp_old = old_name.split("fn")[1].strip("_ ")
-    
-    for func_name in functions_name:
-        if "fn" in func_name:
-            temp_fun_name = func_name.split("fn")[1].strip("_ ")
-            if temp_fun_name == temp_old:
-                return func_name
-        else:
-            if temp_old in func_name:
-                return func_name
-    return old_name
-
-
 def get_max_func_len(functions_name: list[list[int]]) -> int:
-    """Get the max lentgh of the function name
+    """Get the max lentgh of the function name.
 
-        Args:
-            functions_name (list[list[int]]): List of the function name
+    Args:
+        functions_name (list[list[int]]): List of the function name
 
-        Returns:
-            int: the max length between all the function name
+    Returns:
+        int: the max length between all the function name
     """
     length_tab = []
     for func in functions_name:
@@ -61,12 +22,28 @@ def get_max_func_len(functions_name: list[list[int]]) -> int:
     return max(length_tab)
 
 
-def check_func_in_logits(
+def search_func_name(
     logits: list[float],
     function_ids: list[list[int]],
     res: list[int],
-) -> tuple[list[float], list[list[int]], list[int]]:
+    function_found: bool = False
+) -> tuple[list[float], list[list[int]], list[int], bool]:
+    """Found the function name inside the functions definitions.
 
+    Args:
+        function_ids (list[list[int]]): List of the function name encoded
+        res (list[int]): list of the max_token
+        function_found (bool): check if the function name is found or not
+
+    Returns:
+        tuple[
+            list[float],
+            list[list[int]],
+            list[int],
+            bool
+        ]: Update the logits, update the function name ids,
+        update the res, update the function_foun
+    """
     valid_tokens = set()
 
     for func in function_ids:
@@ -74,7 +51,8 @@ def check_func_in_logits(
             valid_tokens.add(func[len(res)])
 
     if not valid_tokens:
-        return logits, function_ids, res
+        function_found = True
+        return logits, function_ids, res, function_found
 
     max_token = max(valid_tokens, key=lambda token: logits[token])
 
@@ -84,7 +62,7 @@ def check_func_in_logits(
 
     res.append(max_token)
 
-    return logits, function_ids, res
+    return logits, function_ids, res, function_found
 
 
 def get_response(
@@ -93,32 +71,34 @@ def get_response(
         functions_ids: list[list[int]],
         functions_name: list[str]
         ) -> str:
-    """Get the response from LLM (its return the function name)
+    """Get the response from LLM (its return the function name).
 
-        Args:
-            model (Small_LLM_Model): The llm model
-            prompt (str): The prompt send to the llm
-            functions_ids: Numeric Representations of all the functions
+    Args:
+        model (Small_LLM_Model): The llm model
+        prompt (str): The prompt send to the llm
+        functions_ids: Numeric Representations of all the functions
 
-        Returns:
-            str: The function name
+    Returns:
+        str: The function name
     """
     input_ids = model.encode(prompt).tolist()[0]
     i = 0
     temp_res = ""
     res: list[int] = []
+    function_found: bool = False
     while i <= get_max_func_len(functions_ids) + 1:
         logits = model.get_logits_from_input_ids(input_ids)
-        logits, functions_ids, res = check_func_in_logits(
-            logits, functions_ids, res
+        logits, functions_ids, res, function_found = search_func_name(
+            logits, functions_ids, res, function_found
             )
+        if function_found:
+            break
         max_token = max(logits)
         token = logits.index(max_token)
         input_ids.append(token)
         temp_res += model.decode([token])
         i += 1
-        print(temp_res, end="")
-    return parse_res(temp_res, functions_name)
+    return temp_res
 
 
 def get_function_name(
@@ -126,14 +106,14 @@ def get_function_name(
         config: dict[str, Any],
         prompt: str
         ) -> str:
-    """Get all the function name from each prompt
+    """Get all the function name from each prompt.
 
-        Args:
-            model (Small_LLM_Model): The LLM model
-            config (dict[str, Any]): The input value in a dict
+    Args:
+        model (Small_LLM_Model): The LLM model
+        config (dict[str, Any]): The input value in a dict
 
-        Returns:
-            list[dict[Any, Any]]: The output value
+    Returns:
+        list[dict[Any, Any]]: The output value
     """
     functions_definition = read_file(config["functions_definition"])
     str_form = []
@@ -145,23 +125,18 @@ def get_function_name(
         input_ids = model.encode(function["name"]).tolist()[0]
         all_function_name_ids.append(input_ids)
 
-    # prompt_list = read_file(config["input"])
-    # for prompt in prompt_list:
-    #     if not prompt["prompt"].strip(" \t\n\a\b\v\f\r"):
-    #         raise Exception("Prompt not valid")
-
     var = '\n'.join(str_form)
-    
+
     temp_prompt = f"""
-        Select one function by matching the user's 
+        Select one function by matching the user's
         intent to the function descriptions.
         Functions:
         {var}
         User request: <request>{prompt}</request>
-        Return only the exact function name 
-        whose description is the best match. 
+        Return only the exact function name
+        whose description is the best match.
         Do not explain. Never invent a function name.
-        Answer: 
+        Answer:
         """.strip()
 
     return get_response(
@@ -169,6 +144,3 @@ def get_function_name(
         all_function_name_ids,
         all_function_name
     )
-
-
-

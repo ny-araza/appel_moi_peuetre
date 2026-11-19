@@ -1,6 +1,9 @@
+"""Get all the parameters of each prompt."""
+
 from llm_sdk import Small_LLM_Model  # type: ignore
 from typing import Any
 import json
+
 
 def get_response(
         model: Small_LLM_Model,
@@ -8,19 +11,19 @@ def get_response(
         function: dict[str, Any],
         keys: list[str]
         ) -> dict[Any, Any]:
-    """Return the llm response to get parameters
+    """Return the llm response to get parameters.
 
-        Args:
-            model (Small_LLM_Model): The llm model
-            prompt (str): the prompt
+    Args:
+        model (Small_LLM_Model): The llm model
+        prompt (str): the prompt
 
-        Returns:
-            str: The llm response
+    Returns:
+        str: The llm response
     """
     input_ids = model.encode(prompt).tolist()[0]
     i = 0
     temp_res = ""
-    params: dict[Any ,Any] = {}
+    params: dict[Any, Any] = {}
     while i < 200:
         logits = model.get_logits_from_input_ids(input_ids)
         max_token = max(logits)
@@ -34,7 +37,16 @@ def get_response(
         i += 1
     return params
 
-def check_valid_params(temp_json: str, keys: list[str]) -> str:
+
+def check_valid_params(temp_json: str, keys: list[str]) -> bool:
+    """Constraint decoding to get the parameters.
+
+    Args:
+        temp_json (str): the params reurned by the llm
+        keys (list[str]): the list of key from function definition
+    Returns:
+        bool: the parameters are valid or not
+    """
     if "}" in temp_json:
         try:
             params: dict[Any, Any] = json.loads(temp_json)
@@ -46,40 +58,46 @@ def check_valid_params(temp_json: str, keys: list[str]) -> str:
             return True
         except Exception:
             return False
+    return False
 
-def check_json_valid(temp_json: str) -> str:
-    try:
-        temp = json.loads(temp_json)
-    except Exception:
-        return temp_json
 
 def format_value(
         params: dict[Any, Any],
         function_params: dict[Any, Any]
         ) -> dict[Any, Any]:
+    """Format the parameters value.
+
+    Args:
+        params (dict[Any, Any]): the params return by the llm
+        function_params (dict[Any, Any]): the function parameters
+    Returns:
+        dict[Any, Any]: the params dict zith the right value
+    """
     for key, value in params.items():
         try:
-            if function_params["parameters"][key].get("type", "string") == "number":
+            temp = function_params["parameters"][key]
+            if temp.get("type", "string") == "number":
                 try:
                     params[key] = float(value)
                 except ValueError:
                     params[key] = str(value)
-            if function_params["parameters"][key].get("type", "string") == "integer":
-                            try:
-                                params[key] = int(value)
-                            except ValueError:
-                                params[key] = str(value)
-            elif function_params["parameters"][key].get("type", "string") == "boolean" \
-                or function_params["parameters"][key].get("type", "string") == "bool":
-                    res: bool = False
-                    if value.lower() == "true":
-                        res = True
-                    params[key] = res
+            elif temp.get("type", "string") == "integer":
+                try:
+                    params[key] = int(value)
+                except ValueError:
+                    params[key] = str(value)
+            elif temp.get("type", "string") == "boolean" \
+                    or temp.get("type", "string") == "bool":
+                res: bool = False
+                if value.lower() == "true":
+                    res = True
+                params[key] = res
             else:
                 params[key] = str(value)
         except KeyError:
             params[key] = str(value)
     return params
+
 
 def get_parameters(
         model: Small_LLM_Model,
@@ -87,15 +105,15 @@ def get_parameters(
         prompt: str,
         function_name: str
         ) -> dict[str, Any]:
-    """Get all the parameters from each prompt
+    """Get all the parameters from each prompt.
 
-        Args:
-            model (Small_LLM_Model): The LLM model
-            res_json (list[dict[Any, Any]]): The output json
-            list_functions (list[dict[Any, Any]]): The functions list
+    Args:
+        model (Small_LLM_Model): The LLM model
+        res_json (list[dict[Any, Any]]): The output json
+        list_functions (list[dict[Any, Any]]): The functions list
 
-        Returns:
-            list[dict[Any, Any]]: The output value
+    Returns:
+        list[dict[Any, Any]]: The output value
     """
     function = {}
     for item in list_functions:
@@ -109,21 +127,26 @@ def get_parameters(
     keys_params = list(function["parameters"].keys())
 
     temp_prompt = [
-        "You are a function argument extraction agent. Extract parameters strictly using the provided context:" \
-        "Your task is to extract the arguments needed to call the function." \
-        f"FUNCTION: {function["name"]}\n" \
-        f"DESCRIPTION : {function["description"]}\n" \
-        f"PARAMETERS:: {function["parameters"]}\n" \
-        f"USER REQUEST : {prompt}\n" \
+        "You are a function argument extraction agent. "
+        "Extract parameters strictly using the provided context:"
+        "Your task is to extract the arguments needed to call the function."
+        f"FUNCTION: {function["name"]}\n"
+        f"DESCRIPTION : {function["description"]}\n"
+        f"PARAMETERS:: {function["parameters"]}\n"
+        f"USER REQUEST : {prompt}\n"
         """Rules:
         1. Preserve exact user values.
         2. Extract ONLY parameters defined in the function.
         3. Do NOT invent, guess, or infer values.
         4. Set missing required parameters to null.
-        5. Output ONLY a valid JSON object: {"param_name": "value"}. No explanations or extra text.
+        5. Output ONLY a valid JSON object: {"param_name": "value"}.
+        No explanations or extra text.
         Output:"""
     ]
-    temp_parameters = get_response(model, temp_prompt[0], function, keys_params)
+    temp_parameters = get_response(
+        model, temp_prompt[0],
+        function, keys_params
+    )
 
     result = format_value(temp_parameters, function)
 
