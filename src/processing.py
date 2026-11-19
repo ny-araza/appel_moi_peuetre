@@ -38,12 +38,14 @@ def process(
             model, config, prompt["prompt"]
         )
 
+        prompt_str = prompt["prompt"]
+
         parameters = get_parameters(
             model, list_functions,
-            prompt["prompt"], function_name
+            prompt_str, function_name
         )
 
-        res["prompt"] = prompt
+        res["prompt"] = prompt_str
         res["name"] = function_name
         res["parameters"] = parameters
 

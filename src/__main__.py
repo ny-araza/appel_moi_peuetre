@@ -2,10 +2,10 @@
 try:
     try:
         from .parse import parse
-        import sys
         from llm_sdk import Small_LLM_Model  # type: ignore
         from .input import check_input
         from .processing import process
+        import sys
     except KeyboardInterrupt:
         raise KeyboardInterrupt("Operation aborted")
     except Exception as e:
