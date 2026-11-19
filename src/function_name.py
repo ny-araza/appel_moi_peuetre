@@ -62,41 +62,30 @@ def get_max_func_len(functions_name: list[list[int]]) -> int:
 
 
 def check_func_in_logits(
-        logits: list[float],
-        function_ids: list[list[int]],
-        res: list[int],
-        ) -> tuple[
-            list[float],
-            list[list[int]],
-            list[int],
-            ]:
-    """Guide the llm to return only the function name
+    logits: list[float],
+    function_ids: list[list[int]],
+    res: list[int],
+) -> tuple[list[float], list[list[int]], list[int]]:
 
-        Args:
-            logits (list[float]): the llm logits listpositional arguments,
-            return the largest argument.
-            function_ids (list[list[int]]): numeric representation
-            of the function name
-            res (list[int]): The function name returned
+    valid_tokens = set()
 
-        Returns:
-            tuple[
-            list[float],
-            list[list[int]],
-            list[int]: return the logits, the function_ids
-            and the res (function name)
-    """
-    max_token = logits.index(max(logits))
+    for func in function_ids:
+        if len(res) < len(func) and func[:len(res)] == res:
+            valid_tokens.add(func[len(res)])
+
+    if not valid_tokens:
+        return logits, function_ids, res
+
+    max_token = max(valid_tokens, key=lambda token: logits[token])
+
     for i in range(len(logits)):
-        logits[i] = float("-inf")
+        if i not in valid_tokens:
+            logits[i] = float("-inf")
 
-    if res in function_ids:
-        return (logits, function_ids, res)
-    for item in function_ids:
-        if max_token in item:
-            res.append(max_token)
-            logits[max_token] = float("+inf")
-    return (logits, function_ids, res)
+    res.append(max_token)
+
+    return logits, function_ids, res
+
 
 def get_response(
         model: Small_LLM_Model,
