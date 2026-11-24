@@ -35,6 +35,5 @@ fclean: clean
 	rm -rf $(CALL_DIR)/.venv
 	rm -rf $(CALL_DIR)/.mypy_cache
 	rm -rf $(CALL_DIR)/data/output
-	rm -rf $(TARGET)
 
 re: fclean all
