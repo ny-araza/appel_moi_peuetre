@@ -3,6 +3,7 @@
 from llm_sdk import Small_LLM_Model  # type: ignore
 from typing import Any
 from .utils import read_file
+import random
 
 
 def get_max_func_len(functions_name: list[list[int]]) -> int:
@@ -49,16 +50,11 @@ def search_func_name(
     for func in function_ids:
         if len(res) < len(func) and func[:len(res)] == res:
             valid_tokens.add(func[len(res)])
-
     if not valid_tokens:
         function_found = True
         return logits, function_ids, res, function_found
 
     max_token = max(valid_tokens, key=lambda token: logits[token])
-
-    for i in range(len(logits)):
-        if i not in valid_tokens:
-            logits[i] = float("-inf")
 
     res.append(max_token)
 
@@ -98,7 +94,22 @@ def get_response(
         input_ids.append(token)
         temp_res += model.decode([token])
         i += 1
-    return temp_res
+    return trim_name(temp_res, functions_name)
+
+
+def trim_name(name: str, function_name: list[str]) -> str:
+    """Force the function name in function_definition.json.
+
+    Args:
+        name (str): the function name from llm
+        function_name (list[str]): function name list
+    returns:
+        str (function name)
+    """
+    name = name.strip("\n ")
+    if name not in function_name:
+        return function_name[random.randint(0, len(function_name))]
+    return name
 
 
 def get_function_name(
@@ -143,4 +154,4 @@ def get_function_name(
         model, temp_prompt,
         all_function_name_ids,
         all_function_name
-    )
+    ).strip("\n ")
