@@ -15,6 +15,18 @@
     }
   },
   {
+	"name": "fn_boolean",
+	"description": "function that return true or false.",
+	"parameters": {
+		"value": {
+			"type": "boolean"
+		}
+	},
+	"returns": {
+		"type": "boolean"
+	}
+  },
+  {
     "name": "fn_greet",
     "description": "Generate a greeting message for a person by name.",
     "parameters": {

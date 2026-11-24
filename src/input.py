@@ -5,6 +5,12 @@ from typing import Any
 from json import load, dumps, JSONDecodeError
 
 
+class Type(BaseModel):
+    """Represents type of parameters."""
+
+    type: str
+
+
 class FunctionCalling(BaseModel):
     """Represents the input model (function calling).
 
@@ -24,8 +30,8 @@ class FunctionCalling(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: str = Field(..., min_length=1)
     description: str = Field(..., min_length=1)
-    parameters: dict[Any, Any]
-    returns: dict[Any, Any]
+    parameters: dict[str, Type]
+    returns: Type
 
 
 class Prompt(BaseModel):
@@ -53,17 +59,23 @@ def load_json(file_path: str) -> list[dict[Any, Any]]:
     Returns:
         list[dict[Any, Any]]: The json load from the file
     """
-    with open(file_path, 'r', encoding='utf-8') as f:
-        data: list[dict[Any, Any]] = load(
-            f, object_pairs_hook=check_duplicate_key)  # type: ignore
-
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data: list[dict[Any, Any]] = load(
+                f, object_pairs_hook=check_duplicate_key)
+    except Exception as e:
+        raise Exception(
+            f"{file_path}: {e}"
+        )
     if not data:
-        raise Exception("No data found in the JSON file")
+        raise Exception(
+            f"{file_path}: No data found in the JSON file"
+        )
 
     return data
 
 
-def check_duplicate_key(item: dict[Any, Any]) -> dict[Any, Any]:
+def check_duplicate_key(item: (list[tuple[Any, Any]])) -> Any | None:
     """Check the duplicate key before loading data from JSON file.
 
     Args:
@@ -94,8 +106,8 @@ def check_prompt_json(file_path: str) -> bool:
 
         try:
             prompt = load_json(file_path)
-        except JSONDecodeError:
-            raise Exception("Prompt json file is empty")
+        except JSONDecodeError as e:
+            raise Exception(f"{e.msg}")
         except Exception as e:
             raise Exception(e)
 
@@ -106,8 +118,7 @@ def check_prompt_json(file_path: str) -> bool:
         return True
     except ValidationError as e:
         for err in e.errors():
-            print(
-                "An error occured: line "
+            raise Exception(
                 f"{file_path}: key {err['loc'][1]}: {err["msg"]}"
             )
         return False
@@ -136,9 +147,9 @@ def check_function_json(file_path: str) -> bool:
         return True
     except ValidationError as e:
         for err in e.errors():
-            print(
-                f"An error occured: {file_path}"
-                f": key {err["loc"][1]}: {err["msg"]}"
+            raise Exception(
+                f"{file_path}: "
+                f"key {err["loc"][1]}: {err["msg"]}"
             )
         return False
 

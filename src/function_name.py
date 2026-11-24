@@ -3,7 +3,6 @@
 from llm_sdk import Small_LLM_Model  # type: ignore
 from typing import Any
 from .utils import read_file
-import random
 
 
 def get_max_func_len(functions_name: list[list[int]]) -> int:
@@ -108,7 +107,7 @@ def trim_name(name: str, function_name: list[str]) -> str:
     """
     name = name.strip("\n ")
     if name not in function_name:
-        return function_name[random.randint(0, len(function_name))]
+        return ""
     return name
 
 

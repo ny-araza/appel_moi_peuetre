@@ -86,15 +86,15 @@ def format_value(
                     params[key] = int(value)
                 except ValueError:
                     params[key] = str(value)
-            elif temp.get("type", "string") == "boolean" \
-                    or temp.get("type", "string") == "bool":
+            elif temp.get("type", "string") == "boolean" or \
+                    temp.get("type", "string") == "bool":
                 res: bool = False
-                if value.lower() == "true":
+                if str(value).lower() == "true":
                     res = True
                 params[key] = res
             else:
                 params[key] = str(value)
-        except KeyError:
+        except Exception:
             params[key] = str(value)
     return params
 

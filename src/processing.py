@@ -23,7 +23,7 @@ def process(
 
     for prompt in prompt_list:
         if not prompt["prompt"].strip(" \t\n\a\b\v\f\r"):
-            raise Exception("Prompt not valid")
+            raise Exception(f"{config['input']}: Prompt not valid")
 
     result: list[dict[str, Any]] = []
 
