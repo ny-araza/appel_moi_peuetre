@@ -4,7 +4,6 @@ HF_CACHE = $(GOINFRE)/home
 CALL_DIR = $(CURDIR)
 LLM_SDK_DIR = $(CALL_DIR)/llm_sdk
 TARGET = installed
-TOML = $(CALL_DIR)/pyproject.toml
 export UV_CACHE_DIR=$(UV_CACHE)
 export HF_HOME=$(HF_CACHE)
 PY_VENV = .venv/bin/python
@@ -29,10 +28,9 @@ clean:
 	@uv cache clean && rm -rf $(HF_CACHE)
 
 debug: install
-	uv run pdb $(CALL_DIR)/src/__main__.py
+	uv run python -m pdb $(CALL_DIR)/src/__main__.py
 
 fclean: clean
-	rm -rf $(TARGET)
 	rm -rf $(CALL_DIR)/src/__pycache*
 	rm -rf $(CALL_DIR)/.venv
 	rm -rf $(CALL_DIR)/.mypy_cache
