@@ -1,7 +1,7 @@
 [
   {
-    "name": "fn_add_number",
-    "description": "Add two numbers together and return their sum",
+    "name": "fn_add_numbers",
+    "description": "Add two numbers together and return their sum.",
     "parameters": {
       "a": {
         "type": "number"
@@ -13,18 +13,6 @@
     "returns": {
       "type": "number"
     }
-  },
-  {
-	"name": "fn_boolean",
-	"description": "function that return true or false.",
-	"parameters": {
-		"value": {
-			"type": "boolean"
-		}
-	},
-	"returns": {
-		"type": "boolean"
-	}
   },
   {
     "name": "fn_greet",
